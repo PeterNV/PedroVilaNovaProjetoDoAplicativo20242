@@ -49,7 +49,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
+import com.example.medidordeimc.db.fb.FBDatabase
+import com.example.medidordeimc.model.User
 import com.example.medidordeimc.nav.BottomNavBar
 import com.example.medidordeimc.nav.MainNavHost
 import com.example.medidordeimc.nav.Route
@@ -57,13 +60,18 @@ import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.MedidorDeIMCTheme
 import com.example.medidordeimc.ui.theme.White
 
+
 class MainMenu : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val modifier = Modifier
         setContent {
-            val viewModel: MainViewModel by viewModels()
+            //val viewModel: MainViewModel by viewModels()
+            val fbDB = remember { FBDatabase() }
+            val viewModel : MainViewModel = viewModel(
+                factory = MainViewModelFactory(fbDB)
+            )
             val navController = rememberNavController()
 
             MedidorDeIMCTheme {

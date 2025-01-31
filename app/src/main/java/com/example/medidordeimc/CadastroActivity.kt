@@ -59,12 +59,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.medidordeimc.db.fb.FBDatabase
+import com.example.medidordeimc.model.User
+import com.example.medidordeimc.model.UserC
 import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.Black
 import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.MedidorDeIMCTheme
+import com.example.medidordeimc.ui.theme.Red
 import com.example.medidordeimc.ui.theme.White
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
+import java.lang.Float
 
 class CadastroActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -113,7 +121,11 @@ fun RegisterPage(modifier: Modifier = Modifier) {
     var email by rememberSaveable { mutableStateOf("") }
     var date by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+    var altura by rememberSaveable { mutableStateOf("") }
     var cpassword by rememberSaveable { mutableStateOf("") }
+    var sexoesco by rememberSaveable { mutableStateOf("") }
+    sexoesco = ""
+
     val activity = LocalContext.current as? Activity
     var isSelectedF by rememberSaveable { mutableStateOf(false) }
     var isSelectedM by rememberSaveable { mutableStateOf(false) }
@@ -195,7 +207,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 onClick = { isSelectedM = !isSelectedM;isSelectedF = false },
                 modifier = Modifier
                     .padding(3.dp)
-                    .offset((-20).dp), // Personalize se necessário
+                    .offset((-20).dp,(-10).dp), // Personalize se necessário
                 enabled = true, // Controle de habilitação
                 interactionSource = remember { MutableInteractionSource() }, // Gerencia interações
                 colors = RadioButtonColors(
@@ -210,14 +222,14 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
                 color = GrayL,
-                modifier = modifier.offset((-20).dp,15.dp))
+                modifier = modifier.offset((-20).dp,8.dp))
 
             RadioButton(
                 selected = isSelectedF, // Estado inicial
                 onClick = { isSelectedF = !isSelectedF; isSelectedM = false },
                 modifier = Modifier
                     .padding(3.dp)
-                    .offset((-20).dp), // Personalize se necessário
+                    .offset((-20).dp,(-10).dp), // Personalize se necessário
                 enabled = true, // Controle de habilitação
                 interactionSource = remember { MutableInteractionSource() }, // Gerencia interações
                 colors = RadioButtonColors(
@@ -232,8 +244,22 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
                 color = GrayL,
-                modifier = modifier.offset((-20).dp,15.dp))
+                modifier = modifier.offset((-20).dp,8.dp))
         }
+        OutlinedTextField(
+            value = altura,
+            placeholder = { Text(text = "SUA ALTURA",
+                fontStyle = FontStyle.Italic,
+                color = GrayL,
+                fontSize = 12.sp
+            ) },
+            modifier = modifier
+                .width(315.dp)
+                .height(50.dp)
+                .offset(0.dp, (-16).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
+            onValueChange = { altura = it },
+            shape = RoundedCornerShape(25.dp)
+        )
         OutlinedTextField(
             value = password,
             placeholder = { Text(text = "SENHA",
@@ -249,6 +275,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(25.dp)
         )
+
         OutlinedTextField(
             value = cpassword,
             placeholder = { Text(text = "CONFIRMAR SENHA",
@@ -268,7 +295,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
 
         )
 
-
+        
 
         Button(
 
@@ -279,14 +306,42 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 .width(315.dp)
                 .offset(0.dp, 2.dp),
             onClick = {
-                Toast.makeText(activity, "CADASTRO OK!", Toast.LENGTH_LONG).show()
+                //Toast.makeText(activity, "CADASTRO OK!", Toast.LENGTH_LONG).show()
+                Firebase.auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(activity!!) { task ->
+
+                        if(isSelectedF == true){
+                            sexoesco = "Feminino"
+                        }
+                        if(isSelectedM == true){
+                            sexoesco = "Masculino"
+                        }
+                        val db = FBDatabase()
+                        db.add(UserC(
+                            name = name, date = date, altura = altura.toFloat(), sexo = sexoesco
+                        ))
+
+
+                        if (task.isSuccessful) {
+                            Toast.makeText(activity,"Registro OK!", Toast.LENGTH_LONG).show()
+                            activity.startActivity(
+                                Intent(activity, MainActivity::class.java).setFlags(
+                                    FLAG_ACTIVITY_SINGLE_TOP )
+                            )
+                            FBDatabase().register(User(name, email))
+                            //FBDatabase().registerc(UserC(name,date,altura.toFloat(),sexoesco))
+                        } else {
+                            Toast.makeText(activity,
+                                "Registro FALHOU!", Toast.LENGTH_LONG).show()
+                        }
+                    }
             },
 
             colors= ButtonColors(
                 containerColor = Aqua80,
-                contentColor = White,
+                contentColor = GrayD,
                 disabledContainerColor = GrayL,
-                disabledContentColor = White,
+                disabledContentColor = GrayD,
             ),
 
         ) {
@@ -304,10 +359,10 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 ) },
             modifier = modifier.width(315.dp),
             colors= ButtonColors(
-                containerColor = Aqua80,
-                contentColor = White,
+                containerColor = Red,
+                contentColor = GrayD,
                 disabledContainerColor = Aqua80,
-                disabledContentColor = White,
+                disabledContentColor = GrayD,
             ),
 
             ) {

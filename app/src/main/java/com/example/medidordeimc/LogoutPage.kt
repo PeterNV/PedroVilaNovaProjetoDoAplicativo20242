@@ -33,6 +33,8 @@ import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.White
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @Composable
 fun LogoutPage(modifier: Modifier = Modifier, viewModel: MainViewModel)  {
@@ -66,7 +68,8 @@ fun LogoutPage(modifier: Modifier = Modifier, viewModel: MainViewModel)  {
 
             modifier = modifier.width(315.dp).offset(0.dp, 15.dp),
             onClick = {
-                activity?.startActivity(
+                Firebase.auth.signOut();
+               activity?.startActivity(
                     Intent(activity, MainActivity::class.java).setFlags(
                         FLAG_ACTIVITY_SINGLE_TOP
                     )
@@ -114,3 +117,4 @@ fun LogoutPage(modifier: Modifier = Modifier, viewModel: MainViewModel)  {
 
     }
 }
+

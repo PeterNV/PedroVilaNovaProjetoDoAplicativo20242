@@ -25,9 +25,10 @@ fun MainNavHost(navController: NavHostController,viewModel: MainViewModel) {
             viewModel = viewModel
         )   }
 
-
         composable<Route.Logout>  { LogoutPage(
-            viewModel = MainViewModel()
-        )   }
+            viewModel = viewModel
+            )
+          }
+
     }
 }

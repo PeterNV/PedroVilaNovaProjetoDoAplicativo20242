@@ -64,12 +64,19 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.medidordeimc.db.fb.FBDatabase
+import com.example.medidordeimc.model.IMC
+import com.example.medidordeimc.model.UserC
 import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.Black
 import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.MedidorDeIMCTheme
+import com.example.medidordeimc.ui.theme.Red
 import com.example.medidordeimc.ui.theme.White
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Date
 
 class CadastroDeIMC1 : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -106,12 +113,14 @@ class CadastroDeIMC1 : ComponentActivity() {
         }
     }
 }
-
+@Preview(showBackground = true)
 @Composable
 fun CIMC1(modifier: Modifier = Modifier) {
 
     var foto by rememberSaveable { mutableStateOf("") }
-
+    val db = FBDatabase()
+    val viewModel = MainViewModel(db)
+    //val altura1 = viewModel.users?.altura?:"[não disponível]"
     var altura by rememberSaveable { mutableStateOf("") }
     var peso by rememberSaveable { mutableStateOf("") }
     val activity = LocalContext.current as? Activity
@@ -131,9 +140,6 @@ fun CIMC1(modifier: Modifier = Modifier) {
                 ambientColor = GrayD,
                 spotColor = GrayD
             ).border(2.dp, White, shape = RoundedCornerShape(25.dp)).background(White,shape = RoundedCornerShape(25.dp)),
-
-
-
         ) {
         Text(
             text = "MIMC",
@@ -144,9 +150,6 @@ fun CIMC1(modifier: Modifier = Modifier) {
             modifier = modifier.offset(0.dp, (-40).dp)
         )
         Button(
-
-
-
             modifier = modifier
                 .width(315.dp)
                 .offset(0.dp, (-22).dp).border(2.dp, GrayD,RoundedCornerShape(25.dp)),
@@ -163,7 +166,7 @@ fun CIMC1(modifier: Modifier = Modifier) {
 
 
 
-        ){ Text(text = "ESCOLHA UMA FOTO",
+        ){ Text(text = "ESCOLHA UMA FOTO ",
             fontStyle = FontStyle.Italic,
             color = GrayD,
             fontSize = 15.sp,
@@ -171,20 +174,7 @@ fun CIMC1(modifier: Modifier = Modifier) {
         )}
 
 
-        OutlinedTextField(
-            value = altura,
-            placeholder = { Text(text = "SUA ALTURA",
-                fontStyle = FontStyle.Italic,
-                color = GrayL,
-                fontSize = 12.sp
-            ) },
-            modifier = modifier
-                .width(315.dp)
-                .height(50.dp)
-                .offset(0.dp, (-12).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
-            onValueChange = { altura = it },
-            shape = RoundedCornerShape(25.dp)
-        )
+
         OutlinedTextField(
             value = peso,
             placeholder = { Text(text = "SEU PESO",
@@ -194,26 +184,28 @@ fun CIMC1(modifier: Modifier = Modifier) {
             ) },
             modifier = modifier
                 .width(315.dp)
-                .height(50.dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
+                .height(50.dp).offset(0.dp,(-10).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
             onValueChange = { peso = it },
             shape = RoundedCornerShape(25.dp),
 
-
-
-
             )
-
-
 
         Button(
 
-            enabled =  altura.isNotEmpty()
-                    && peso.isNotEmpty()
+            enabled = peso.isNotEmpty()
             ,
             modifier = modifier
                 .width(315.dp)
                 .offset(0.dp, 2.dp),
             onClick = {
+
+                //val altur2 = viewModel.users?.altura
+                //val alturaFinal = altur1?.toFloat()?.times(altur2?.toFloat()!!)
+                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                val currentDate = LocalDateTime.now().format(formatter)
+               // if (alturaFinal != null) {
+                    db.addImc(IMC(imc = ((peso.toFloat())/6), datet = currentDate, peso = peso.toFloat()))
+                //}
                 activity?.startActivity(
                     Intent(activity, CadastroDeIMC2::class.java).setFlags(
                         FLAG_ACTIVITY_SINGLE_TOP
@@ -223,9 +215,9 @@ fun CIMC1(modifier: Modifier = Modifier) {
 
             colors= ButtonColors(
                 containerColor = Aqua80,
-                contentColor = White,
+                contentColor = GrayD,
                 disabledContainerColor = GrayL,
-                disabledContentColor = White,
+                disabledContentColor = GrayD,
             ),
 
             ) {
@@ -243,10 +235,10 @@ fun CIMC1(modifier: Modifier = Modifier) {
                 ) },
             modifier = modifier.width(315.dp),
             colors= ButtonColors(
-                containerColor = Aqua80,
-                contentColor = White,
-                disabledContainerColor = Aqua80,
-                disabledContentColor = White,
+                containerColor = Red,
+                contentColor = GrayD,
+                disabledContainerColor = Red,
+                disabledContentColor = GrayD,
             ),
 
             ) {

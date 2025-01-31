@@ -2,6 +2,7 @@ package com.example.medidordeimc
 
 import android.app.Activity
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NO_HISTORY
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
 import android.graphics.drawable.Icon
 import android.media.Image
@@ -87,6 +88,8 @@ import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.GreenL
 import com.example.medidordeimc.ui.theme.White
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
 
@@ -269,18 +272,34 @@ fun LoginPage(modifier: Modifier = Modifier) {
                 enabled = email.isNotEmpty() && password.isNotEmpty(),
                 modifier = modifier.width(315.dp).offset(0.dp,15.dp),
                 onClick = {
+                    /*
                     activity?.startActivity(
                         Intent(activity, MainMenu::class.java).setFlags(
                             FLAG_ACTIVITY_SINGLE_TOP
                         )
                     )
                     Toast.makeText(activity, "LOGIN OK!", Toast.LENGTH_LONG).show()
+
+                     */
+                    Firebase.auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(activity!!) { task ->
+                            if (task.isSuccessful) {
+                                activity.startActivity(
+                                    Intent(activity, MainMenu::class.java).setFlags(
+                                        FLAG_ACTIVITY_SINGLE_TOP
+                                    )
+                                )
+                                Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
+                            } else {
+                                Toast.makeText(activity, "Login FALHOU!", Toast.LENGTH_LONG).show()
+                            }
+                        }
                 },
                 colors= ButtonColors(
                     containerColor = Aqua80,
-                    contentColor = White,
+                    contentColor = GrayD,
                     disabledContainerColor = GrayL,
-                    disabledContentColor = White,
+                    disabledContentColor = GrayD,
                 ),
 
                 ) {
@@ -293,9 +312,17 @@ fun LoginPage(modifier: Modifier = Modifier) {
                 onClick = {
 
                     try {
+                        /*
                         val intent = Intent(activity, CadastroActivity::class.java)
                         intent.flags = FLAG_ACTIVITY_SINGLE_TOP
                         activity?.startActivity(intent)
+
+                         */
+                        activity?.startActivity(
+                            Intent(activity, CadastroActivity::class.java).setFlags(
+                                FLAG_ACTIVITY_SINGLE_TOP or FLAG_ACTIVITY_NO_HISTORY
+                            )
+                        )
                     } catch (e: Exception) {
                         e.printStackTrace() // Captura exceções para depuração
                         Toast.makeText(activity, "Erro ao iniciar atividade", Toast.LENGTH_SHORT).show()
@@ -304,9 +331,9 @@ fun LoginPage(modifier: Modifier = Modifier) {
                 modifier = modifier.width(315.dp).offset(0.dp,15.dp),
                 colors= ButtonColors(
                     containerColor = Aqua80,
-                    contentColor = White,
+                    contentColor = GrayD,
                     disabledContainerColor = Aqua80,
-                    disabledContentColor = White,
+                    disabledContentColor = GrayD,
                 ),
 
             ) {
