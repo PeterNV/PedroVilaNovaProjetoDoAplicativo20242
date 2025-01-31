@@ -278,9 +278,9 @@ fun LoginPage(modifier: Modifier = Modifier) {
                 },
                 colors= ButtonColors(
                     containerColor = Aqua80,
-                    contentColor = White,
+                    contentColor = GrayD,
                     disabledContainerColor = GrayL,
-                    disabledContentColor = White,
+                    disabledContentColor = GrayD,
                 ),
 
                 ) {
@@ -304,9 +304,9 @@ fun LoginPage(modifier: Modifier = Modifier) {
                 modifier = modifier.width(315.dp).offset(0.dp,15.dp),
                 colors= ButtonColors(
                     containerColor = Aqua80,
-                    contentColor = White,
+                    contentColor = GrayD,
                     disabledContainerColor = Aqua80,
-                    disabledContentColor = White,
+                    disabledContentColor = GrayD,
                 ),
 
             ) {

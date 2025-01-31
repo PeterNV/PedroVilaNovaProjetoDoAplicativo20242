@@ -64,6 +64,7 @@ import com.example.medidordeimc.ui.theme.Black
 import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.MedidorDeIMCTheme
+import com.example.medidordeimc.ui.theme.Red
 import com.example.medidordeimc.ui.theme.White
 
 class CadastroActivity : ComponentActivity() {
@@ -113,6 +114,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
     var email by rememberSaveable { mutableStateOf("") }
     var date by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+    var altura by rememberSaveable { mutableStateOf("") }
     var cpassword by rememberSaveable { mutableStateOf("") }
     val activity = LocalContext.current as? Activity
     var isSelectedF by rememberSaveable { mutableStateOf(false) }
@@ -195,7 +197,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 onClick = { isSelectedM = !isSelectedM;isSelectedF = false },
                 modifier = Modifier
                     .padding(3.dp)
-                    .offset((-20).dp), // Personalize se necessário
+                    .offset((-20).dp,(-10).dp), // Personalize se necessário
                 enabled = true, // Controle de habilitação
                 interactionSource = remember { MutableInteractionSource() }, // Gerencia interações
                 colors = RadioButtonColors(
@@ -210,14 +212,14 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
                 color = GrayL,
-                modifier = modifier.offset((-20).dp,15.dp))
+                modifier = modifier.offset((-20).dp,8.dp))
 
             RadioButton(
                 selected = isSelectedF, // Estado inicial
                 onClick = { isSelectedF = !isSelectedF; isSelectedM = false },
                 modifier = Modifier
                     .padding(3.dp)
-                    .offset((-20).dp), // Personalize se necessário
+                    .offset((-20).dp,(-10).dp), // Personalize se necessário
                 enabled = true, // Controle de habilitação
                 interactionSource = remember { MutableInteractionSource() }, // Gerencia interações
                 colors = RadioButtonColors(
@@ -232,8 +234,23 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
                 color = GrayL,
-                modifier = modifier.offset((-20).dp,15.dp))
+                modifier = modifier.offset((-20).dp,8.dp))
         }
+        OutlinedTextField(
+            value = altura,
+            placeholder = { Text(text = "SUA ALTURA",
+                fontStyle = FontStyle.Italic,
+                color = GrayL,
+                fontSize = 12.sp
+            ) },
+            modifier = modifier
+                .width(315.dp)
+                .height(50.dp)
+                .offset(0.dp, (-16).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
+            onValueChange = { altura = it },
+            visualTransformation = PasswordVisualTransformation(),
+            shape = RoundedCornerShape(25.dp)
+        )
         OutlinedTextField(
             value = password,
             placeholder = { Text(text = "SENHA",
@@ -249,6 +266,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(25.dp)
         )
+
         OutlinedTextField(
             value = cpassword,
             placeholder = { Text(text = "CONFIRMAR SENHA",
@@ -284,9 +302,9 @@ fun RegisterPage(modifier: Modifier = Modifier) {
 
             colors= ButtonColors(
                 containerColor = Aqua80,
-                contentColor = White,
+                contentColor = GrayD,
                 disabledContainerColor = GrayL,
-                disabledContentColor = White,
+                disabledContentColor = GrayD,
             ),
 
         ) {
@@ -304,10 +322,10 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 ) },
             modifier = modifier.width(315.dp),
             colors= ButtonColors(
-                containerColor = Aqua80,
-                contentColor = White,
+                containerColor = Red,
+                contentColor = GrayD,
                 disabledContainerColor = Aqua80,
-                disabledContentColor = White,
+                disabledContentColor = GrayD,
             ),
 
             ) {

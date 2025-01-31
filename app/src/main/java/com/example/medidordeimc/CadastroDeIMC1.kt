@@ -69,6 +69,7 @@ import com.example.medidordeimc.ui.theme.Black
 import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.MedidorDeIMCTheme
+import com.example.medidordeimc.ui.theme.Red
 import com.example.medidordeimc.ui.theme.White
 
 class CadastroDeIMC1 : ComponentActivity() {
@@ -106,7 +107,7 @@ class CadastroDeIMC1 : ComponentActivity() {
         }
     }
 }
-
+@Preview(showBackground = true)
 @Composable
 fun CIMC1(modifier: Modifier = Modifier) {
 
@@ -144,9 +145,6 @@ fun CIMC1(modifier: Modifier = Modifier) {
             modifier = modifier.offset(0.dp, (-40).dp)
         )
         Button(
-
-
-
             modifier = modifier
                 .width(315.dp)
                 .offset(0.dp, (-22).dp).border(2.dp, GrayD,RoundedCornerShape(25.dp)),
@@ -171,20 +169,7 @@ fun CIMC1(modifier: Modifier = Modifier) {
         )}
 
 
-        OutlinedTextField(
-            value = altura,
-            placeholder = { Text(text = "SUA ALTURA",
-                fontStyle = FontStyle.Italic,
-                color = GrayL,
-                fontSize = 12.sp
-            ) },
-            modifier = modifier
-                .width(315.dp)
-                .height(50.dp)
-                .offset(0.dp, (-12).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
-            onValueChange = { altura = it },
-            shape = RoundedCornerShape(25.dp)
-        )
+
         OutlinedTextField(
             value = peso,
             placeholder = { Text(text = "SEU PESO",
@@ -194,16 +179,11 @@ fun CIMC1(modifier: Modifier = Modifier) {
             ) },
             modifier = modifier
                 .width(315.dp)
-                .height(50.dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
+                .height(50.dp).offset(0.dp,(-10).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
             onValueChange = { peso = it },
             shape = RoundedCornerShape(25.dp),
 
-
-
-
             )
-
-
 
         Button(
 
@@ -223,9 +203,9 @@ fun CIMC1(modifier: Modifier = Modifier) {
 
             colors= ButtonColors(
                 containerColor = Aqua80,
-                contentColor = White,
+                contentColor = GrayD,
                 disabledContainerColor = GrayL,
-                disabledContentColor = White,
+                disabledContentColor = GrayD,
             ),
 
             ) {
@@ -243,10 +223,10 @@ fun CIMC1(modifier: Modifier = Modifier) {
                 ) },
             modifier = modifier.width(315.dp),
             colors= ButtonColors(
-                containerColor = Aqua80,
-                contentColor = White,
-                disabledContainerColor = Aqua80,
-                disabledContentColor = White,
+                containerColor = Red,
+                contentColor = GrayD,
+                disabledContainerColor = Red,
+                disabledContentColor = GrayD,
             ),
 
             ) {
