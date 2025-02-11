@@ -3,11 +3,15 @@ package com.example.medidordeimc
 import android.app.Activity
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+import android.graphics.Bitmap
 import android.graphics.drawable.Icon
 import android.os.Bundle
+import android.provider.MediaStore
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 //import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.border
@@ -64,6 +68,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.example.medidordeimc.db.fb.FBDatabase
 import com.example.medidordeimc.model.IMC
 import com.example.medidordeimc.model.UserC
@@ -77,15 +82,35 @@ import com.example.medidordeimc.ui.theme.White
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
-
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.util.Base64
+import android.util.Log
+import java.io.ByteArrayOutputStream
+import java.util.logging.Logger.global
+fun bitmapToBase64(bitmap: Bitmap): String {
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+    val byteArray = byteArrayOutputStream.toByteArray()
+    return Base64.encodeToString(byteArray, Base64.DEFAULT)
+}
 class CadastroDeIMC1 : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
+    //private var foto by mutableStateOf("")
+    private var foto: String = ""
+    @OptIn(ExperimentalMaterial3Api::class)
+    /*
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val modifier = Modifier
+
         //enableEdgeToEdge()
+
+
         setContent {
             MedidorDeIMCTheme {
+                var fotoState by rememberSaveable { mutableStateOf("") }
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     TopAppBar(
                         modifier = modifier.shadow(
@@ -106,18 +131,106 @@ class CadastroDeIMC1 : ComponentActivity() {
 
                         })
 
-                    CIMC1(modifier = Modifier.padding(innerPadding))
+                    CIMC1(
+                        modifier = Modifier.padding(innerPadding),
+                        verificarPermissaoECapturarFoto = { verificarPermissaoECapturarFoto() },
+                        foto = fotoState,
+                        setFoto = { fotoState = it }
+                    )
                     Spacer(modifier = Modifier.size(24.dp))
+
                 }
             }
         }
     }
-}
-@Preview(showBackground = true)
-@Composable
-fun CIMC1(modifier: Modifier = Modifier) {
+*/
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    var foto by rememberSaveable { mutableStateOf("") }
+        setContent {
+            MedidorDeIMCTheme {
+                var fotoState by rememberSaveable { mutableStateOf("") } // Estado para a foto
+
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    TopAppBar(
+                        modifier = Modifier.shadow(
+                            elevation = 5.dp,
+                            clip = false,
+                            ambientColor = GrayD,
+                            spotColor = GrayD
+                        ),
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = White,
+                            titleContentColor = Black,
+                        ),
+                        title = {
+                            Text(
+                                "Cadastro de IMC",
+                                fontWeight = FontWeight.Bold,
+                                fontStyle = FontStyle.Italic,
+                                modifier = Modifier.offset(105.dp, 2.dp)
+                            )
+                        }
+                    )
+
+                    CIMC1(
+                        modifier = Modifier.padding(innerPadding),
+                        verificarPermissaoECapturarFoto = { verificarPermissaoECapturarFoto() },
+                        foto = fotoState,
+                        setFoto = { fotoState = it } // Atualiza corretamente
+                    )
+                }
+            }
+        }
+    }
+    private val cameraPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                abrirCamera()
+            } else {
+                Toast.makeText(this, "Permissão da câmera negada", Toast.LENGTH_SHORT).show()
+            }
+        }
+    private fun verificarPermissaoECapturarFoto() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+
+            abrirCamera()
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+    val cameraLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val imageBitmap = result.data?.extras?.get("data") as? Bitmap
+                imageBitmap?.let { bitmap ->
+                    val encodedImage = bitmapToBase64(bitmap)
+                    setFoto(encodedImage) // Usa a função corretamente
+                }
+            }
+        }
+
+    private fun setFoto(encodedImage: String) {
+        foto = encodedImage
+    }
+
+
+    fun abrirCamera() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraLauncher.launch(intent)
+    }
+    fun base64ToBitmap(base64String: String): Bitmap? {
+        val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+    }
+}
+
+//@Preview(showBackground = true)
+@Composable
+fun CIMC1(modifier: Modifier = Modifier,verificarPermissaoECapturarFoto: () -> Unit,foto: String,
+          setFoto: (String) -> Unit) {
+
+    //var foto by rememberSaveable { mutableStateOf("") }
     val db = FBDatabase()
     val viewModel = MainViewModel(db)
     //val altura1 = viewModel.users?.altura?:"[não disponível]"
@@ -154,7 +267,9 @@ fun CIMC1(modifier: Modifier = Modifier) {
                 .width(315.dp)
                 .offset(0.dp, (-22).dp).border(2.dp, GrayD,RoundedCornerShape(25.dp)),
             onClick = {
-                Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
+                //Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
+
+                verificarPermissaoECapturarFoto()
             },
 
             colors= ButtonColors(
@@ -166,7 +281,7 @@ fun CIMC1(modifier: Modifier = Modifier) {
 
 
 
-        ){ Text(text = "ESCOLHA UMA FOTO ",
+        ){ Text(text = "ESCOLHA UMA FOTO",
             fontStyle = FontStyle.Italic,
             color = GrayD,
             fontSize = 15.sp,
@@ -204,7 +319,12 @@ fun CIMC1(modifier: Modifier = Modifier) {
                 val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
                 val currentDate = LocalDateTime.now().format(formatter)
                // if (alturaFinal != null) {
-                    db.addImc(IMC(imc = ((peso.toFloat())/6), datet = currentDate, peso = peso.toFloat()))
+
+                    db.addImc(IMC(imc = ((peso.toFloat())/6), datet = currentDate, peso = peso.toFloat(),
+                        image = foto.toString()
+                    ))
+                Log.d("DB", "Foto inserida com sucesso: ${foto}")
+
                 //}
                 activity?.startActivity(
                     Intent(activity, CadastroDeIMC2::class.java).setFlags(
@@ -227,7 +347,7 @@ fun CIMC1(modifier: Modifier = Modifier) {
         }
 
         Button(
-            onClick = { foto = ""; altura = ""; peso = ""
+            onClick = { ; altura = ""; peso = ""
                 activity?.startActivity(
                     Intent(activity, MainMenu::class.java).setFlags(
                         FLAG_ACTIVITY_SINGLE_TOP
@@ -246,8 +366,5 @@ fun CIMC1(modifier: Modifier = Modifier) {
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold)
         }
-
-
-
     }
 }

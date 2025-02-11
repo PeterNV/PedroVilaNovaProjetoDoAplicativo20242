@@ -65,14 +65,22 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     ) {
         Text(
 
-            text = "BEM-VINDO(A) $name",
+            text = "BEM-VINDO(A)",
             fontSize = 27.sp,
             color = GrayD,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
             modifier = modifier.offset(0.dp, (-15).dp)
         )
+        Text(
 
+            text = "($name)",
+            fontSize = 25.sp,
+            color = GrayD,
+            fontWeight = FontWeight.Bold,
+            fontStyle = FontStyle.Italic,
+            modifier = modifier.offset(0.dp, (-5).dp)
+        )
         Button(
 
             
