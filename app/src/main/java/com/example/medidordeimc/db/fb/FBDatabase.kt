@@ -3,7 +3,6 @@ package com.example.medidordeimc.db.fb
 import com.example.medidordeimc.MainViewModel
 import com.example.medidordeimc.model.IMC
 import com.example.medidordeimc.model.User
-import com.example.medidordeimc.model.UserC
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentChange
@@ -13,7 +12,7 @@ import com.google.firebase.firestore.firestore
 class FBDatabase {
     interface Listener {
         fun onUserLoaded(user: User)
-        fun onUserCAdded(user: UserC)
+
         fun onImcAdded(imc: IMC)
     }
     private val auth = Firebase.auth
@@ -33,18 +32,13 @@ class FBDatabase {
                     listener?.onUserLoaded(user.toUser())
                 }
             }
-            citiesListReg = refCurrUser.collection("userc")
-                .addSnapshotListener { snapshots, ex ->
-                    if (ex != null) return@addSnapshotListener
-                    snapshots?.documentChanges?.forEach { change ->
-                        val fbUserC = change.document.toObject(FbUserC::class.java)
-                        if (change.type == DocumentChange.Type.ADDED) {
-                            listener?.onUserCAdded(fbUserC.toUserC())
-                        } else if (change.type == DocumentChange.Type.REMOVED) {
-                            listener?.onUserCAdded(fbUserC.toUserC())
-                        }
-                    }
+            val refCurrImc = db.collection("usersimc")
+                .document(auth.currentUser!!.uid)
+            refCurrImc.get().addOnSuccessListener {
+                it.toObject(FBImc::class.java)?.let { imc ->
+                    listener?.onImcAdded((imc.toImc()))
                 }
+            }
         }
 
     }
@@ -58,24 +52,14 @@ class FBDatabase {
         val uid = auth.currentUser!!.uid
         db.collection("users").document(uid + "").set(user.toFBUser());
     }
-    fun registerc(user: UserC) {
-        if (auth.currentUser == null)
-            throw RuntimeException("User not logged in!")
-        val uid = auth.currentUser!!.uid
-        db.collection("users").document(uid + "").set(user.toFBUserC());
-    }
-    fun add(user: UserC) {
-        if (auth.currentUser == null)
-            throw RuntimeException("User not logged in!")
-        val uid = auth.currentUser!!.uid
-        db.collection("users").document(uid).collection("usersc")
-            .document(user.name).set(user.toFBUserC())
-    }
+
     fun addImc(imc: IMC) {
         if (auth.currentUser == null)
             throw RuntimeException("User not logged in!")
         val uid = auth.currentUser!!.uid
         db.collection("users").document(uid).collection("usersimc")
             .document(imc.imc.toString()).set(imc.toFBImc())
+
     }
+
 }

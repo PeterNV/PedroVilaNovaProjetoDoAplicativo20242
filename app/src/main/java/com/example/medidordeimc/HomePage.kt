@@ -38,16 +38,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medidordeimc.db.fb.FBDatabase
 import com.example.medidordeimc.model.User
-import com.example.medidordeimc.model.UserC
 import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.GreenL
 import com.example.medidordeimc.ui.theme.White
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+
 @Composable
 fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     val name = viewModel.user?.name?:"[não logado]"
-    val altura1 = viewModel.users?.altura?:"[não disponível]"
+
     val activity = LocalContext.current as? Activity
     Column(
 
@@ -87,11 +89,11 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
             modifier = modifier.width(315.dp).offset(0.dp, 15.dp),
             onClick = {
                 try {
+
                     val intent = Intent(activity, CadastroDeIMC1::class.java)
                     intent.flags = FLAG_ACTIVITY_SINGLE_TOP
                     activity?.startActivity(intent)
 
-                    //FBDatabase().register(User(name, email))
                 } catch (e: Exception) {
                     e.printStackTrace() // Captura exceções para depuração
                     Toast.makeText(activity, "Erro ao iniciar atividade", Toast.LENGTH_SHORT).show()
@@ -112,9 +114,5 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
                 fontWeight = FontWeight.Bold
             )
         }
-
-
-    
-
     }
 }

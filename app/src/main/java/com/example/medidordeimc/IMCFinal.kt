@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 
 import androidx.compose.foundation.layout.Row
@@ -67,18 +68,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medidordeimc.db.fb.FBDatabase
 import com.example.medidordeimc.ui.theme.Aqua80
+
 import com.example.medidordeimc.ui.theme.Black
 import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.MedidorDeIMCTheme
 import com.example.medidordeimc.ui.theme.White
+import kotlinx.coroutines.delay
 
 class IMCFinal : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val modifier = Modifier
+        val peso = intent.getStringExtra("peso") ?: "0.0"
         //enableEdgeToEdge()
         setContent {
             MedidorDeIMCTheme {
@@ -101,25 +107,72 @@ class IMCFinal : ComponentActivity() {
                                 modifier = modifier.offset(105.dp, (2).dp))
 
                         })
-                    IMCF(modifier = Modifier.padding(innerPadding))
+                    IMCF(modifier = Modifier.padding(innerPadding), peso = peso)
                     Spacer(modifier = Modifier.size(24.dp))
                 }
             }
         }
     }
 }
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
-fun IMCF(modifier: Modifier = Modifier) {
+fun IMCF(modifier: Modifier = Modifier, peso: String) {
 
 
+    val fbDB = remember { FBDatabase() }
+    val viewModel : MainViewModel = viewModel(
+        factory = MainViewModelFactory(fbDB)
+    )
+    var valorImc by rememberSaveable { mutableStateOf("") }
+   // var peso by rememberSaveable { mutableStateOf("") }
+    var altura by rememberSaveable { mutableStateOf("") }
+    altura = (viewModel.user?.altura?:1).toString()
+    //val peso = intent.getStringExtra("peso") ?: "0.0"
 
+    //peso = (Intent.getIntent("peso") ?: 1.0).toString()
+
+    valorImc =  ((peso.toFloat())/(altura.toFloat()*altura.toFloat())).toString()
+    val valImc = valorImc.toFloat()
     var isSelectedI1 by rememberSaveable { mutableStateOf(false) }
     var isSelectedI2 by rememberSaveable { mutableStateOf(false) }
     var isSelectedI3 by rememberSaveable { mutableStateOf(false) }
-
+    var resultado by rememberSaveable { mutableStateOf("") }
+    var recomendacao by rememberSaveable { mutableStateOf("") }
     val activity = LocalContext.current as? Activity
-
+    if (valImc <= 18.5){
+        resultado = "(${valorImc}) Abaixo do peso"
+        recomendacao = "Procurar orientação médica e nutricional para investigar possíveis \n" +
+                "causas (como distúrbios alimentares, condições médicas subjacentes) e desenvolver um plano de \n" +
+                "alimentação para alcançar um peso saudável. "
+    }
+    if (18.5 < valImc && valImc <= 24.9){
+        resultado = "(${valorImc}) Peso normal"
+        recomendacao = "Manter um estilo de vida equilibrado, com uma dieta saudável e \n" +
+                "atividade física regular para sustentar o\n "+
+                "peso e a saúde geral."
+    }
+    if (25.1 < valImc && valImc <= 29.9){
+        resultado = "(${valorImc}) Sobrepeso"
+        recomendacao = "Adotar um plano de alimentação balanceada e aumentar a atividade \n" +
+                "física para ajudar na perda de peso e melhorar a saúde geral."
+    }
+    if (30.1 < valImc && valImc <= 34.9){
+        resultado = "(${valorImc}) Obesidade Grau 1"
+        recomendacao = "Consultar um profissional de saúde para uma avaliação \n" +
+                "completa e considerar mudanças mais estruturadas na dieta e nos exercícios físicos. "
+    }
+    if (35.1 < valImc && valImc <= 39.9){
+        resultado = "(${valorImc}) Obesidade Grau 2"
+        recomendacao = "Intervenções mais intensivas, como programas \n" +
+                "supervisionados de perda de peso e consultas com nutricionistas, médicos e possivelmente psicólogos, para \n" +
+                "tratar questões relacionadas à alimentação e ao estilo de vida. "
+    }
+    if ( valImc >= 40.1){
+        resultado = "(${valorImc}) Obesidade Grau 3"
+        recomendacao = " Necessidade de acompanhamento médico rigoroso. Podem ser \n" +
+                "necessárias intervenções como terapia comportamental intensiva, medicamentos para perda de peso e, em \n" +
+                "alguns casos, cirurgia bariátrica. \n"
+    }
     Column(
         //modifier = modifier.padding(19.dp,145.dp).fillMaxSize(),
 
@@ -135,7 +188,9 @@ fun IMCF(modifier: Modifier = Modifier) {
                 clip = false,
                 ambientColor = GrayD,
                 spotColor = GrayD
-            ).border(2.dp, White, shape = RoundedCornerShape(25.dp)).background(White,shape = RoundedCornerShape(25.dp)),
+            )
+            .border(2.dp, White, shape = RoundedCornerShape(25.dp))
+            .background(White, shape = RoundedCornerShape(25.dp)),
 
 
 
@@ -151,8 +206,8 @@ fun IMCF(modifier: Modifier = Modifier) {
         )
 
             Text(
-                text = "RESULTADO: 26.6 (SOBREPESO).",
-                fontSize = 18.sp,
+                text = "RESULTADO: $resultado",
+                fontSize = 15.sp,
                 color = GrayL,
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
@@ -162,8 +217,8 @@ fun IMCF(modifier: Modifier = Modifier) {
 
 
             Text(
-                text = "RECOMENDAÇÃO: Adotar um plano de alimentação balanceado, e aumentar atividade física.",
-                fontSize = 18.sp,
+                text = "RECOMENDAÇÃO: $recomendacao",
+                fontSize = 15.sp,
                 color = GrayL,
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
@@ -179,7 +234,9 @@ fun IMCF(modifier: Modifier = Modifier) {
                         FLAG_ACTIVITY_SINGLE_TOP
                     )
                 ) },
-            modifier = modifier.width(315.dp).offset(0.dp,25.dp),
+            modifier = modifier
+                .width(315.dp)
+                .offset(0.dp, 25.dp),
             colors= ButtonColors(
                 containerColor = Aqua80,
                 contentColor = White,

@@ -159,17 +159,6 @@ fun LoginPage(modifier: Modifier = Modifier) {
             ambientColor = GrayD,
             spotColor = GrayD
         ).border(2.dp, White, shape = RoundedCornerShape(25.dp)).background(White,shape = RoundedCornerShape(25.dp)),
-
-        /*
-        modifier = modifier.shadow(
-            elevation = 15.dp,
-            shape = RoundedCornerShape(25.dp),
-            clip = false,
-            ambientColor = GrayD,
-            spotColor = GrayD
-        )
-        */
-
     ) {
         Text(
             text = "BEM-VINDO",
@@ -272,15 +261,7 @@ fun LoginPage(modifier: Modifier = Modifier) {
                 enabled = email.isNotEmpty() && password.isNotEmpty(),
                 modifier = modifier.width(315.dp).offset(0.dp,15.dp),
                 onClick = {
-                    /*
-                    activity?.startActivity(
-                        Intent(activity, MainMenu::class.java).setFlags(
-                            FLAG_ACTIVITY_SINGLE_TOP
-                        )
-                    )
-                    Toast.makeText(activity, "LOGIN OK!", Toast.LENGTH_LONG).show()
 
-                     */
                     Firebase.auth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(activity!!) { task ->
                             if (task.isSuccessful) {
@@ -312,12 +293,7 @@ fun LoginPage(modifier: Modifier = Modifier) {
                 onClick = {
 
                     try {
-                        /*
-                        val intent = Intent(activity, CadastroActivity::class.java)
-                        intent.flags = FLAG_ACTIVITY_SINGLE_TOP
-                        activity?.startActivity(intent)
 
-                         */
                         activity?.startActivity(
                             Intent(activity, CadastroActivity::class.java).setFlags(
                                 FLAG_ACTIVITY_SINGLE_TOP or FLAG_ACTIVITY_NO_HISTORY
@@ -341,7 +317,5 @@ fun LoginPage(modifier: Modifier = Modifier) {
                     fontStyle = FontStyle.Italic,
                     fontWeight = FontWeight.Bold)
             }
-
-
     }
 }

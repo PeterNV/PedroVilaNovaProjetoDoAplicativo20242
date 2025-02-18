@@ -61,7 +61,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medidordeimc.db.fb.FBDatabase
 import com.example.medidordeimc.model.User
-import com.example.medidordeimc.model.UserC
 import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.Black
 import com.example.medidordeimc.ui.theme.GrayD
@@ -71,8 +70,7 @@ import com.example.medidordeimc.ui.theme.Red
 import com.example.medidordeimc.ui.theme.White
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
-import java.lang.Float
+
 
 class CadastroActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -289,13 +287,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
             onValueChange = { cpassword = it },
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(25.dp),
-
-
-
-
         )
-
-        
 
         Button(
 
@@ -316,11 +308,12 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                         if(isSelectedM == true){
                             sexoesco = "Masculino"
                         }
+                        /*
                         val db = FBDatabase()
                         db.add(UserC(
                             name = name, date = date, altura = altura.toFloat(), sexo = sexoesco
                         ))
-
+                        */
 
                         if (task.isSuccessful) {
                             Toast.makeText(activity,"Registro OK!", Toast.LENGTH_LONG).show()
@@ -328,7 +321,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                                 Intent(activity, MainActivity::class.java).setFlags(
                                     FLAG_ACTIVITY_SINGLE_TOP )
                             )
-                            FBDatabase().register(User(name, email))
+                            FBDatabase().register(User(name, email,date,altura.toFloat(),sexoesco))
                             //FBDatabase().registerc(UserC(name,date,altura.toFloat(),sexoesco))
                         } else {
                             Toast.makeText(activity,

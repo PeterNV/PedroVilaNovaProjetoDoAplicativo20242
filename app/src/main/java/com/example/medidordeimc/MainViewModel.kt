@@ -7,20 +7,17 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.medidordeimc.db.fb.FBDatabase
 import com.example.medidordeimc.model.IMC
 import com.example.medidordeimc.model.User
-import com.example.medidordeimc.model.UserC
 
 
 class MainViewModel (private val db: FBDatabase): ViewModel(), FBDatabase.Listener {
     init {
         db.setListener(this)
     }
-    private val _users = mutableStateOf<UserC?> (null)
-    val users : UserC?
-        get() = _users.value
 
-    private val _imcs = mutableStateOf<IMC?> (null)
-    val imcs : IMC?
-        get() = _imcs.value
+
+    private val _imc = mutableStateOf<IMC?> (null)
+    val imc : IMC?
+        get() = _imc.value
 
     private val _user = mutableStateOf<User?> (null)
     val user : User?
@@ -30,12 +27,9 @@ class MainViewModel (private val db: FBDatabase): ViewModel(), FBDatabase.Listen
         _user.value = user
     }
     override fun onImcAdded(imc: IMC) {
-        _imcs.value = imcs
+        _imc.value = imc
     }
-    override fun onUserCAdded(user: UserC) {
-        _users.value = user
-        //_users.add(user)
-    }
+
 
 }
 
