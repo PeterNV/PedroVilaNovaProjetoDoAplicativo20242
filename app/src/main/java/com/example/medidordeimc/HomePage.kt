@@ -22,7 +22,9 @@ import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -45,11 +47,13 @@ import com.example.medidordeimc.ui.theme.GreenL
 import com.example.medidordeimc.ui.theme.White
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     val name = viewModel.user?.name?:"[não logado]"
-
+    val imcList = viewModel.imcs
+    var i by rememberSaveable { mutableIntStateOf(0) }
     val activity = LocalContext.current as? Activity
     Column(
 
@@ -68,11 +72,11 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
         Text(
 
             text = "BEM-VINDO(A)",
-            fontSize = 27.sp,
+            fontSize = 40.sp,
             color = GrayD,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
-            modifier = modifier.offset(0.dp, (-15).dp)
+            modifier = modifier.offset(0.dp, (-35).dp)
         )
         Text(
 
@@ -83,10 +87,42 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
             fontStyle = FontStyle.Italic,
             modifier = modifier.offset(0.dp, (-5).dp)
         )
+
+
+        LaunchedEffect(Unit) {
+            i = 0 // Reseta o índice ao entrar na tela
+            while (true) {
+                delay(3000) // Aguarda 3 segundos
+
+                if (imcList.isNotEmpty()) {
+                    i = (i + 1) % imcList.size // Avança e volta para o primeiro quando chega ao fim
+                } else {
+                    i = 0 // Se a lista estiver vazia, garante que i seja sempre zero
+                }
+            }
+        }
+
+        Text(
+            text = if (imcList.isNotEmpty()) "(IMC: %.2f)".format(imcList[i].imc) else "Lista vazia!",
+            fontSize = 18.sp,
+            color = GrayD,
+            fontWeight = FontWeight.Bold,
+            fontStyle = FontStyle.Italic,
+            modifier = modifier.offset(0.dp, 5.dp)
+        )
+
+        Text(
+            text = if (imcList.isNotEmpty()) "(DATA: ${imcList[i].datet})" else "Lista vazia!",
+            fontSize = 18.sp,
+            color = GrayD,
+            fontWeight = FontWeight.Bold,
+            fontStyle = FontStyle.Italic,
+            modifier = modifier.offset(0.dp, 15.dp)
+        )
         Button(
 
             
-            modifier = modifier.width(315.dp).offset(0.dp, 15.dp),
+            modifier = modifier.width(315.dp).offset(0.dp, 45.dp),
             onClick = {
                 try {
 

@@ -14,15 +14,18 @@ class FBDatabase {
         fun onUserLoaded(user: User)
 
         fun onImcAdded(imc: IMC)
+        fun onImcsAdded(imc: IMC)
+        fun onDatesAdded(date: IMC)
     }
     private val auth = Firebase.auth
     private val db = Firebase.firestore
-    private var citiesListReg: ListenerRegistration? = null
+    private var imcListReg: ListenerRegistration? = null
+    private var imcDateReg: ListenerRegistration? = null
     private var listener : Listener? = null
     init {
         auth.addAuthStateListener { auth ->
             if (auth.currentUser == null) {
-                citiesListReg?.remove()
+                imcListReg?.remove()
                 return@addAuthStateListener
             }
             val refCurrUser = db.collection("users")
@@ -32,13 +35,27 @@ class FBDatabase {
                     listener?.onUserLoaded(user.toUser())
                 }
             }
-            val refCurrImc = db.collection("usersimc")
-                .document(auth.currentUser!!.uid)
-            refCurrImc.get().addOnSuccessListener {
-                it.toObject(FBImc::class.java)?.let { imc ->
-                    listener?.onImcAdded((imc.toImc()))
+
+            imcListReg = refCurrUser.collection("usersimc")
+                .addSnapshotListener { snapshots, ex ->
+                    if (ex != null) return@addSnapshotListener
+                    snapshots?.documentChanges?.forEach { change ->
+                        val fbImc = change.document.toObject(FBImc::class.java)
+                        if (change.type == DocumentChange.Type.ADDED) {
+                            listener?.onImcsAdded(fbImc.toImc())
+                        }
+                    }
                 }
-            }
+            imcDateReg = refCurrUser.collection("usersimc")
+                .addSnapshotListener { snapshots, ex ->
+                    if (ex != null) return@addSnapshotListener
+                    snapshots?.documentChanges?.forEach { change ->
+                        val fbImc = change.document.toObject(FBImc::class.java)
+                        if (change.type == DocumentChange.Type.ADDED) {
+                            listener?.onImcsAdded(fbImc.toImc())
+                        }
+                    }
+                }
         }
 
     }

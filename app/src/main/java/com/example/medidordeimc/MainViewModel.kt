@@ -1,6 +1,7 @@
 package com.example.medidordeimc
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -16,9 +17,20 @@ class MainViewModel (private val db: FBDatabase): ViewModel(), FBDatabase.Listen
 
 
     private val _imc = mutableStateOf<IMC?> (null)
-    val imc : IMC?
+    val imcv : IMC?
         get() = _imc.value
+/*
+    private val _imcs = mutableStateOf<String, IMC> ()
+    val imcs : List<IMC>
+        get() = _imcs.value.toList()
 
+ */
+    private val _imcs = mutableStateMapOf<Float, IMC>()
+    val imcs : List<IMC>
+        get() = _imcs.values.toList()
+    private val _dates = mutableStateMapOf<String, IMC>()
+    val dates : List<IMC>
+        get() = _dates.values.toList()
     private val _user = mutableStateOf<User?> (null)
     val user : User?
         get() = _user.value
@@ -29,8 +41,12 @@ class MainViewModel (private val db: FBDatabase): ViewModel(), FBDatabase.Listen
     override fun onImcAdded(imc: IMC) {
         _imc.value = imc
     }
-
-
+    override fun onImcsAdded(imc: IMC) {
+        _imcs[imc.imc] = imc
+    }
+    override fun onDatesAdded(date: IMC) {
+        _dates[date.datet] = date
+    }
 }
 
 class MainViewModelFactory(private val db : FBDatabase) :

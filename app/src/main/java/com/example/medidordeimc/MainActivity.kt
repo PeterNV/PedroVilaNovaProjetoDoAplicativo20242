@@ -161,7 +161,7 @@ fun LoginPage(modifier: Modifier = Modifier) {
         ).border(2.dp, White, shape = RoundedCornerShape(25.dp)).background(White,shape = RoundedCornerShape(25.dp)),
     ) {
         Text(
-            text = "BEM-VINDO",
+            text = "BEM-VINDO(A)",
             fontSize = 40.sp,
             color = GrayD,
             fontWeight = FontWeight.Bold,
