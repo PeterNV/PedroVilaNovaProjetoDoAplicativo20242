@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.sp
 import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.Black
 import com.example.medidordeimc.ui.theme.GrayD
-import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.White
 @Composable
 fun FotosPage (modifier: Modifier = Modifier, viewModel: MainViewModel) {
@@ -64,8 +63,8 @@ fun FotosPage (modifier: Modifier = Modifier, viewModel: MainViewModel) {
             },
             colors = ButtonColors(
                 containerColor = Aqua80,
-                contentColor = White,
-                disabledContainerColor = GrayL,
+                contentColor = GrayD,
+                disabledContainerColor = GrayD,
                 disabledContentColor = White,
             ),
 
@@ -84,8 +83,8 @@ fun FotosPage (modifier: Modifier = Modifier, viewModel: MainViewModel) {
             modifier = modifier.width(315.dp).offset(0.dp,15.dp),
             colors= ButtonColors(
                 containerColor = Aqua80,
-                contentColor = White,
-                disabledContainerColor = Aqua80,
+                contentColor = GrayD,
+                disabledContainerColor = GrayD,
                 disabledContentColor = White,
             ),
 

@@ -1,7 +1,5 @@
 package com.example.medidordeimc
 
-import android.app.Activity
-import android.app.ProgressDialog.show
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -15,45 +13,23 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medidordeimc.db.fb.FBDatabase
 import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.GrayD
-import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.White
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 
-import androidx.compose.ui.Alignment
-
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-/*
-import com.patrykandpatrick.vico.core.chart.BarChart
-import com.patrykandpatrick.vico.core.entry.BarEntry
-import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
-import com.patrykandpatrick.vico.core.entry.ChartData
-import com.patrykandpatrick.vico.core.entry.ChartEntry
-
- */
 @Composable
 fun GrafPage (modifier: Modifier = Modifier, viewModel: MainViewModel) {
 
-    val activity = LocalContext.current as? Activity
+
     val fbDB = remember { FBDatabase() }
     val viewModel : MainViewModel = viewModel(
         factory = MainViewModelFactory(fbDB)
@@ -219,8 +195,8 @@ fun GrafPage (modifier: Modifier = Modifier, viewModel: MainViewModel) {
             },
             colors = ButtonColors(
                 containerColor = Aqua80,
-                contentColor = White,
-                disabledContainerColor = GrayL,
+                contentColor = GrayD,
+                disabledContainerColor = GrayD,
                 disabledContentColor = White,
             ),
 
@@ -239,8 +215,8 @@ fun GrafPage (modifier: Modifier = Modifier, viewModel: MainViewModel) {
             modifier = modifier.width(315.dp).offset(0.dp,15.dp),
             colors= ButtonColors(
                 containerColor = Aqua80,
-                contentColor = White,
-                disabledContainerColor = Aqua80,
+                contentColor = GrayD,
+                disabledContainerColor = GrayD,
                 disabledContentColor = White,
             ),
 

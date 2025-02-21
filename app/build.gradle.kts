@@ -9,6 +9,15 @@ plugins {
 }
 
 android {
+    packaging {
+        resources {
+            excludes += "license/README.dom.txt"
+            excludes += "license/LICENSE.dom-documentation.txt"
+            excludes += "license/NOTICE"
+            excludes += "license/LICENSE.dom-software.txt"
+            excludes += "license/LICENSE"
+        }
+    }
     namespace = "com.example.medidordeimc"
     compileSdk = 35
 
@@ -45,8 +54,7 @@ android {
 
 dependencies {
     // Dependências essenciais para serialização
-    implementation ("com.patrykandpatrick.vico:core:1.0.0")
-    implementation ("com.patrykandpatrick.vico:charts-compose:1.0.0")
+    implementation("xml-apis:xml-apis:1.4.01")
     implementation("org.jetbrains.lets-plot:lets-plot-common:4.1.0")
     implementation("org.jetbrains.lets-plot:lets-plot-image-export:4.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0") // ou a versão mais recente

@@ -4,12 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -26,12 +24,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.GrayD
-import com.example.medidordeimc.ui.theme.GrayL
+import com.example.medidordeimc.ui.theme.Red
 import com.example.medidordeimc.ui.theme.White
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -77,9 +73,9 @@ fun LogoutPage(modifier: Modifier = Modifier, viewModel: MainViewModel)  {
 
             },
             colors = ButtonColors(
-                containerColor = Aqua80,
-                contentColor = White,
-                disabledContainerColor = GrayL,
+                containerColor = Red,
+                contentColor = GrayD,
+                disabledContainerColor = GrayD,
                 disabledContentColor = White,
             ),
 
@@ -90,28 +86,7 @@ fun LogoutPage(modifier: Modifier = Modifier, viewModel: MainViewModel)  {
                 fontWeight = FontWeight.Bold
             )
         }
-        Button(
-            onClick = {
-                activity?.startActivity(
-                    Intent(activity, MainMenu::class.java).setFlags(
-                        FLAG_ACTIVITY_SINGLE_TOP
-                    )
-                )
 
-            },
-            modifier = modifier.width(315.dp).offset(0.dp,15.dp),
-            colors= ButtonColors(
-                containerColor = Aqua80,
-                contentColor = White,
-                disabledContainerColor = Aqua80,
-                disabledContentColor = White,
-            ),
-
-            ) {
-            Text("NÃO",
-                fontStyle = FontStyle.Italic,
-                fontWeight = FontWeight.Bold)
-        }
 
 
 

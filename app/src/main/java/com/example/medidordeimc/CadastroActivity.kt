@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-//import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-//import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -26,21 +24,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
-//import androidx.compose.material3.Checkbox
-//import androidx.compose.material3.CheckboxColors
-//import androidx.compose.material3.DropdownMenuItem
-//import androidx.compose.material3.ExperimentalMaterial3Api
-//import androidx.compose.material3.ExposedDropdownMenuBox
-//import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonColors
-//import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-//import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,8 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-//import androidx.compose.ui.geometry.Offset
-//import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -65,6 +53,7 @@ import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.Black
 import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.GrayL
+import com.example.medidordeimc.ui.theme.GreenL
 import com.example.medidordeimc.ui.theme.MedidorDeIMCTheme
 import com.example.medidordeimc.ui.theme.Red
 import com.example.medidordeimc.ui.theme.White
@@ -77,7 +66,6 @@ class CadastroActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //enableEdgeToEdge()
         setContent {
             MedidorDeIMCTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -113,7 +101,6 @@ class CadastroActivity : ComponentActivity() {
 
 @Preview(showBackground = true)
 @Composable
-
 fun RegisterPage(modifier: Modifier = Modifier) {
     var name by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
@@ -177,13 +164,14 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 fontSize = 12.sp,
             )}
         )
+        val regexDate = "^(3[01]|[12][0-9]|0[1-9]|[1-9])/(1[0-2]|0[1-9]|[1-9])/[0-9]{4}$".toRegex()
         OutlinedTextField(
             value = date,
 
             modifier = modifier
                 .width(315.dp)
                 .height(50.dp)
-                .offset(0.dp, (-16).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
+                .offset(0.dp, (-16).dp).border(2.dp, color = if(date.isEmpty()) GrayD else if( !date.contains(regexDate)) Red else GreenL, shape = RoundedCornerShape(25.dp)),
             onValueChange = { date = it },
             shape = RoundedCornerShape(25.dp),
             placeholder = { Text(text = "DATA DE NASCIMENTO (DD/MM/AAAA)",
@@ -258,6 +246,8 @@ fun RegisterPage(modifier: Modifier = Modifier) {
             onValueChange = { altura = it },
             shape = RoundedCornerShape(25.dp)
         )
+        val regexPassword = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")
+
         OutlinedTextField(
             value = password,
             placeholder = { Text(text = "SENHA",
@@ -268,7 +258,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
             modifier = modifier
                 .width(315.dp)
                 .height(50.dp)
-                .offset(0.dp, (-8).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
+                .offset(0.dp, (-8).dp).border(2.dp,  color = if(password.isEmpty()) GrayD else if(!password.contains(regexPassword)) Red else GreenL, shape = RoundedCornerShape(25.dp)),
             onValueChange = { password = it },
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(25.dp)
@@ -283,46 +273,41 @@ fun RegisterPage(modifier: Modifier = Modifier) {
             ) },
             modifier = modifier
                 .width(315.dp)
-                .height(50.dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
+                .height(50.dp).border(2.dp,  color = if(cpassword.isEmpty()) GrayD else if(cpassword != password) Red else GreenL, shape = RoundedCornerShape(25.dp)),
             onValueChange = { cpassword = it },
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(25.dp),
         )
 
-        Button(
 
-            enabled = email.isNotEmpty() && password.isNotEmpty()
-                      && name.isNotEmpty() && date.isNotEmpty() && cpassword.isNotEmpty()
-                      && cpassword == password && (isSelectedF == true || isSelectedM == true),
+        Button(
+            enabled = (email.isNotEmpty() && password.isNotEmpty()
+                    && name.isNotEmpty() && date.isNotEmpty() && cpassword.isNotEmpty()
+                    && cpassword == password) && (isSelectedF || isSelectedM) && password.contains(regexPassword) && (date.length == 9 || date.length == 10) && date.contains(regexDate),
             modifier = modifier
                 .width(315.dp)
                 .offset(0.dp, 2.dp),
             onClick = {
-                //Toast.makeText(activity, "CADASTRO OK!", Toast.LENGTH_LONG).show()
+
                 Firebase.auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(activity!!) { task ->
 
-                        if(isSelectedF == true){
+                        if(isSelectedF){
                             sexoesco = "Feminino"
                         }
-                        if(isSelectedM == true){
+                        if(isSelectedM){
                             sexoesco = "Masculino"
                         }
-                        /*
-                        val db = FBDatabase()
-                        db.add(UserC(
-                            name = name, date = date, altura = altura.toFloat(), sexo = sexoesco
-                        ))
-                        */
+
 
                         if (task.isSuccessful) {
-                            Toast.makeText(activity,"Registro OK!", Toast.LENGTH_LONG).show()
+                            Toast.makeText(activity,"Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show()
                             activity.startActivity(
                                 Intent(activity, MainActivity::class.java).setFlags(
                                     FLAG_ACTIVITY_SINGLE_TOP )
                             )
                             FBDatabase().register(User(name, email,date,altura.toFloat(),sexoesco))
-                            //FBDatabase().registerc(UserC(name,date,altura.toFloat(),sexoesco))
+
                         } else {
                             Toast.makeText(activity,
                                 "Registro FALHOU!", Toast.LENGTH_LONG).show()
@@ -363,33 +348,5 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold)
         }
-        /*
-        Button(
-            onClick = {
-
-                activity?.startActivity(
-                    Intent(activity, MainActivity::class.java).setFlags(
-                        FLAG_ACTIVITY_SINGLE_TOP
-                    )
-                )
-            }
-
-        ) {Text("Main") }
-
-
-        Button(
-            onClick = {
-
-                activity?.startActivity(
-                    Intent(activity, RegisterActivity::class.java).setFlags(
-                        FLAG_ACTIVITY_SINGLE_TOP
-                    )
-                )
-            }
-
-        ) {Text("Registro") }
-         */
-
-
     }
 }

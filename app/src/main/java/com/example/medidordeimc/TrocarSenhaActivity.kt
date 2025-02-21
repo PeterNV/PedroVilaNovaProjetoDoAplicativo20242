@@ -8,47 +8,15 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-//import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-//import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-//import androidx.compose.material3.Checkbox
-//import androidx.compose.material3.CheckboxColors
-//import androidx.compose.material3.DropdownMenuItem
-//import androidx.compose.material3.ExperimentalMaterial3Api
-//import androidx.compose.material3.ExposedDropdownMenuBox
-//import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonColors
-//import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-//import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-//import androidx.compose.ui.geometry.Offset
-//import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -56,17 +24,39 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.medidordeimc.ui.theme.Aqua80
-import com.example.medidordeimc.ui.theme.GrayD
-import com.example.medidordeimc.ui.theme.GrayL
-import com.example.medidordeimc.ui.theme.MedidorDeIMCTheme
-import com.example.medidordeimc.ui.theme.White
+import com.example.medidordeimc.ui.theme.*
+import com.google.firebase.auth.*
+import com.google.firebase.firestore.FirebaseFirestore
+
+fun alterarSenha(email: String, senhaAtual: String, novaSenha: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    val auth = FirebaseAuth.getInstance()
+
+    // Autentica o usuário antes de alterar a senha
+    auth.signInWithEmailAndPassword(email, senhaAtual)
+        .addOnSuccessListener {
+            val usuario = auth.currentUser
+            usuario?.updatePassword(novaSenha)
+                ?.addOnSuccessListener { onSuccess() }
+                ?.addOnFailureListener { exception -> onFailure(exception) }
+        }
+        .addOnFailureListener { exception -> onFailure(exception) }
+}
+
+fun verificarEmailFirestore(email: String, onResult: (Boolean) -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+    db.collection("users").whereEqualTo("email", email).get()
+        .addOnSuccessListener { documents ->
+            onResult(!documents.isEmpty)
+        }
+        .addOnFailureListener {
+            onResult(false)
+        }
+}
 
 class TrocarSenhaActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //enableEdgeToEdge()
         setContent {
             MedidorDeIMCTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -77,39 +67,25 @@ class TrocarSenhaActivity : ComponentActivity() {
         }
     }
 }
-
-
-
 @Preview(showBackground = true)
 @Composable
-
 fun SenhaPage(modifier: Modifier = Modifier) {
-
     var email by rememberSaveable { mutableStateOf("") }
-
-    var password by rememberSaveable { mutableStateOf("") }
-    var cpassword by rememberSaveable { mutableStateOf("") }
+    var senhaAtual by rememberSaveable { mutableStateOf("") }
+    var novaSenha by rememberSaveable { mutableStateOf("") }
+    var confirmarSenha by rememberSaveable { mutableStateOf("") }
     val activity = LocalContext.current as? Activity
 
     Column(
-        //modifier = modifier.padding(19.dp,145.dp).fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = CenterHorizontally,
-
         modifier = modifier
             .padding(19.dp, 195.dp)
             .fillMaxSize()
-            .shadow(
-                elevation = 5.dp,
-                shape = RoundedCornerShape(25.dp),
-                clip = false,
-                ambientColor = GrayD,
-                spotColor = GrayD
-            ).border(2.dp, White, shape = RoundedCornerShape(25.dp)).background(White,shape = RoundedCornerShape(25.dp)),
-
-
-
-        ) {
+            .shadow(5.dp, RoundedCornerShape(25.dp))
+            .border(2.dp, White, RoundedCornerShape(25.dp))
+            .background(White, RoundedCornerShape(25.dp))
+    ) {
         Text(
             text = "MUDAR SENHA",
             fontSize = 40.sp,
@@ -118,131 +94,81 @@ fun SenhaPage(modifier: Modifier = Modifier) {
             fontStyle = FontStyle.Italic,
             modifier = modifier.offset(0.dp, (-40).dp)
         )
+
         OutlinedTextField(
             value = email,
-
-            modifier = modifier
-                .width(315.dp)
-                .height(50.dp)
-                .offset(0.dp, (-24).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
             onValueChange = { email = it },
             shape = RoundedCornerShape(25.dp),
-            placeholder = { Text(text = "E-MAIL",
-                fontStyle = FontStyle.Italic,
-                color = GrayL,
-                fontSize = 12.sp,
-            )}
+            placeholder = { Text("E-MAIL", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) },
+            modifier = modifier.width(315.dp).height(50.dp).offset(0.dp, (-15).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp))
         )
 
-
         OutlinedTextField(
-            value = password,
-            placeholder = { Text(text = "SENHA",
-                fontStyle = FontStyle.Italic,
-                color = GrayL,
-                fontSize = 12.sp
-            ) },
-            modifier = modifier
-                .width(315.dp)
-                .height(50.dp)
-                .offset(0.dp, (-12).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
-            onValueChange = { password = it },
-            visualTransformation = PasswordVisualTransformation(),
-            shape = RoundedCornerShape(25.dp)
-        )
-        OutlinedTextField(
-            value = cpassword,
-            placeholder = { Text(text = "CONFIRMAR SENHA",
-                fontStyle = FontStyle.Italic,
-                color = GrayL,
-                fontSize = 12.sp
-            ) },
-            modifier = modifier
-                .width(315.dp)
-                .height(50.dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
-            onValueChange = { cpassword = it },
+            value = senhaAtual,
+            onValueChange = { senhaAtual = it },
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(25.dp),
+            placeholder = { Text("SENHA ATUAL", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) },
+            modifier = modifier.width(315.dp).height(50.dp).offset(0.dp, (-10).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp))
+        )
 
+        OutlinedTextField(
+            value = novaSenha,
+            onValueChange = { novaSenha = it },
+            visualTransformation = PasswordVisualTransformation(),
+            shape = RoundedCornerShape(25.dp),
+            placeholder = { Text("NOVA SENHA", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) },
+            modifier = modifier.width(315.dp).height(50.dp).offset(0.dp, (-5).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp))
+        )
 
-
-
-            )
-
-
+        OutlinedTextField(
+            value = confirmarSenha,
+            onValueChange = { confirmarSenha = it },
+            visualTransformation = PasswordVisualTransformation(),
+            shape = RoundedCornerShape(25.dp),
+            placeholder = { Text("CONFIRMAR SENHA", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) },
+            modifier = modifier.width(315.dp).height(50.dp).offset(0.dp, (0).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp))
+        )
 
         Button(
-
-            enabled = email.isNotEmpty() && password.isNotEmpty()
-                     && cpassword.isNotEmpty()
-                    ,
-            modifier = modifier
-                .width(315.dp)
-                .offset(0.dp, 2.dp),
+            enabled = email.isNotEmpty() && senhaAtual.isNotEmpty() && novaSenha.isNotEmpty() && novaSenha == confirmarSenha,
+            modifier = modifier.width(315.dp).offset(0.dp, 2.dp),
             onClick = {
-                Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
+                verificarEmailFirestore(email) { existe ->
+                    if (existe) {
+                        alterarSenha(email, senhaAtual, novaSenha,
+                            onSuccess = {
+                                Toast.makeText(activity, "Senha alterada com sucesso!", Toast.LENGTH_SHORT).show()
+                                Intent(activity, MainActivity::class.java).setFlags(
+                                    FLAG_ACTIVITY_SINGLE_TOP
+                                )
+                            },
+                            onFailure = { erro ->
+                                Toast.makeText(activity, "Erro ao alterar senha: ${erro.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    } else {
+                        Toast.makeText(activity, "Erro! E-mail não encontrado", Toast.LENGTH_SHORT).show()
+                    }
+                }
             },
-
-            colors= ButtonColors(
-                containerColor = Aqua80,
-                contentColor = White,
-                disabledContainerColor = GrayL,
-                disabledContentColor = White,
-            ),
-
-            ) {
-            Text("CONFIRMAR",
-                fontStyle = FontStyle.Italic,
-                fontWeight = FontWeight.Bold)
+            colors = ButtonDefaults.buttonColors(containerColor = Aqua80)
+        ) {
+            Text("CONFIRMAR", fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold)
         }
 
         Button(
-            onClick = { email = ""; password = ""
-                activity?.startActivity(
-                    Intent(activity, MainActivity::class.java).setFlags(
-                        FLAG_ACTIVITY_SINGLE_TOP
-                    )
-                ) },
+            onClick = {
+                email = ""
+                senhaAtual = ""
+                novaSenha = ""
+                confirmarSenha = ""
+                activity?.startActivity(Intent(activity, MainActivity::class.java).setFlags(FLAG_ACTIVITY_SINGLE_TOP))
+            },
             modifier = modifier.width(315.dp),
-            colors= ButtonColors(
-                containerColor = Aqua80,
-                contentColor = White,
-                disabledContainerColor = Aqua80,
-                disabledContentColor = White,
-            ),
-
-            ) {
-            Text("CANCELAR",
-                fontStyle = FontStyle.Italic,
-                fontWeight = FontWeight.Bold)
+            colors = ButtonDefaults.buttonColors(containerColor = Red,contentColor = GrayD)
+        ) {
+            Text("CANCELAR", fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold)
         }
-        /*
-        Button(
-            onClick = {
-
-                activity?.startActivity(
-                    Intent(activity, MainActivity::class.java).setFlags(
-                        FLAG_ACTIVITY_SINGLE_TOP
-                    )
-                )
-            }
-
-        ) {Text("Main") }
-
-
-        Button(
-            onClick = {
-
-                activity?.startActivity(
-                    Intent(activity, RegisterActivity::class.java).setFlags(
-                        FLAG_ACTIVITY_SINGLE_TOP
-                    )
-                )
-            }
-
-        ) {Text("Registro") }
-         */
-
-
     }
 }
