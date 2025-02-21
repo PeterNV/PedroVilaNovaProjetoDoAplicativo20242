@@ -111,13 +111,13 @@ fun SenhaPage(modifier: Modifier = Modifier) {
             placeholder = { Text("SENHA ATUAL", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) },
             modifier = modifier.width(315.dp).height(50.dp).offset(0.dp, (-10).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp))
         )
-
+        val regexPassword = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")
         OutlinedTextField(
             value = novaSenha,
             onValueChange = { novaSenha = it },
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(25.dp),
-            placeholder = { Text("NOVA SENHA", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) },
+            placeholder = { Text("NOVA SENHA", fontStyle = FontStyle.Italic, color =  GrayL, fontSize = 12.sp) },
             modifier = modifier.width(315.dp).height(50.dp).offset(0.dp, (-5).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp))
         )
 
@@ -126,12 +126,12 @@ fun SenhaPage(modifier: Modifier = Modifier) {
             onValueChange = { confirmarSenha = it },
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(25.dp),
-            placeholder = { Text("CONFIRMAR SENHA", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) },
-            modifier = modifier.width(315.dp).height(50.dp).offset(0.dp, (0).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp))
+            placeholder = { Text("CONFIRMAR NOVA SENHA", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) },
+            modifier = modifier.width(315.dp).height(50.dp).offset(0.dp, (0).dp).border(2.dp, color = if(confirmarSenha.isEmpty()) GrayD else if(confirmarSenha != novaSenha) Red else GreenL, shape = RoundedCornerShape(25.dp))
         )
 
         Button(
-            enabled = email.isNotEmpty() && senhaAtual.isNotEmpty() && novaSenha.isNotEmpty() && novaSenha == confirmarSenha,
+            enabled = email.isNotEmpty() && senhaAtual.isNotEmpty() && novaSenha.isNotEmpty() && novaSenha == confirmarSenha && novaSenha.contains(regexPassword),
             modifier = modifier.width(315.dp).offset(0.dp, 2.dp),
             onClick = {
                 verificarEmailFirestore(email) { existe ->

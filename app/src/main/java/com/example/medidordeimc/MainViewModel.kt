@@ -1,6 +1,6 @@
 package com.example.medidordeimc
 
-import androidx.compose.runtime.mutableStateListOf
+
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -19,12 +19,7 @@ class MainViewModel (private val db: FBDatabase): ViewModel(), FBDatabase.Listen
     private val _imc = mutableStateOf<IMC?> (null)
     val imcv : IMC?
         get() = _imc.value
-/*
-    private val _imcs = mutableStateOf<String, IMC> ()
-    val imcs : List<IMC>
-        get() = _imcs.value.toList()
 
- */
     private val _imcs = mutableStateMapOf<Float, IMC>()
     val imcs : List<IMC>
         get() = _imcs.values.toList()

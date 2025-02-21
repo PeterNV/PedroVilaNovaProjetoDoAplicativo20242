@@ -1,61 +1,26 @@
 package com.example.medidordeimc
 
-import android.Manifest
-import android.app.Activity
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-
-import androidx.compose.runtime.setValue
-
 import androidx.compose.ui.Modifier
-
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.medidordeimc.nav.BottomNavItem
-
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavDestination.Companion.hasRoute
 import com.example.medidordeimc.db.fb.FBDatabase
-import com.example.medidordeimc.model.User
 import com.example.medidordeimc.nav.BottomNavBar
 import com.example.medidordeimc.nav.MainNavHost
-import com.example.medidordeimc.nav.Route
 import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.MedidorDeIMCTheme
 import com.example.medidordeimc.ui.theme.White
