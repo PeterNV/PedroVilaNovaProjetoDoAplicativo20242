@@ -1,4 +1,4 @@
 package com.example.medidordeimc.model
 
-class IMC(val imc: Float, val datet: String, val peso: Float) {
+class IMC(val imc: Float, val datet: String, val peso: Float, val fotoname: String) {
 }

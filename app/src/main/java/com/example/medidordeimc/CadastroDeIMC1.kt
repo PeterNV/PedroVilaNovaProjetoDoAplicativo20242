@@ -77,6 +77,7 @@ import androidx.compose.material3.RadioButtonColors
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 
@@ -113,7 +114,7 @@ fun uploadBase64Image(base64String: String, fileName: String, onComplete: (Boole
         onComplete(false, null)
     }
 }
-
+private var fotoNome: String = ""
 class CadastroDeIMC1 : ComponentActivity() {
 
     private var foto: String = ""
@@ -178,10 +179,16 @@ class CadastroDeIMC1 : ComponentActivity() {
                 val imageBitmap = result.data?.extras?.get("data") as? Bitmap
                 imageBitmap?.let { bitmap ->
                     val encodedImage = bitmapToBase64(bitmap)
+                    val email = FirebaseAuth.getInstance().currentUser?.email ?: "unknown"
                     val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-hh-mm-ss")
-                    val currentDate = LocalDateTime.now().format(formatter)
 
-                    uploadBase64Image(encodedImage, "$currentDate.jpg") { success, url ->
+                    fotoNome = if (email != "unknown") {
+                        LocalDateTime.now().format(formatter) + email
+                    } else {
+                        LocalDateTime.now().format(formatter)
+                    }
+
+                    uploadBase64Image(encodedImage, "$fotoNome.jpg") { success, url ->
                         if (success) {
                             foto = url ?: ""
                             Toast.makeText(this, "Imagem enviada com sucesso!", Toast.LENGTH_SHORT).show()
@@ -192,6 +199,7 @@ class CadastroDeIMC1 : ComponentActivity() {
                 }
             }
         }
+
 
     fun abrirCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -212,6 +220,7 @@ fun CIMC1(modifier: Modifier = Modifier,verificarPermissaoECapturarFoto: () -> U
 
 
     var altura by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
     var peso by rememberSaveable { mutableStateOf("") }
     val activity = LocalContext.current as? Activity
 
@@ -240,6 +249,7 @@ fun CIMC1(modifier: Modifier = Modifier,verificarPermissaoECapturarFoto: () -> U
             modifier = modifier.offset(0.dp, (-40).dp)
         )
         Button(
+            enabled = peso.isNotEmpty(),
             modifier = modifier
                 .width(315.dp)
                 .offset(0.dp, (-22).dp).border(2.dp, GrayD,RoundedCornerShape(25.dp)),
@@ -247,6 +257,9 @@ fun CIMC1(modifier: Modifier = Modifier,verificarPermissaoECapturarFoto: () -> U
                 //Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
 
                 verificarPermissaoECapturarFoto()
+                altura = (viewModel.user?.altura?:1).toString()
+                email = (viewModel.user?.email?:"unknown").toString()
+
             },
 
             colors= ButtonColors(
@@ -258,7 +271,7 @@ fun CIMC1(modifier: Modifier = Modifier,verificarPermissaoECapturarFoto: () -> U
 
 
 
-        ){ Text(text = "ESCOLHA UMA FOTO",
+            ){ Text(text = "TIRAR FOTO",
             fontStyle = FontStyle.Italic,
             color = GrayD,
             fontSize = 15.sp,
@@ -290,6 +303,7 @@ fun CIMC1(modifier: Modifier = Modifier,verificarPermissaoECapturarFoto: () -> U
             textAlign = TextAlign.Center,
             modifier = modifier.offset(0.dp, 2.dp)
         )
+
         var isSelectedI1 by rememberSaveable { mutableStateOf(false) }
         var isSelectedI2 by rememberSaveable { mutableStateOf(false) }
         var isSelectedI3 by rememberSaveable { mutableStateOf(false) }
@@ -367,20 +381,21 @@ fun CIMC1(modifier: Modifier = Modifier,verificarPermissaoECapturarFoto: () -> U
                 .width(315.dp)
                 .offset(0.dp, 2.dp),
             onClick = {
-                altura = (viewModel.user?.altura?:1).toString()
                 val alturaFinal = altura.toFloat()*altura.toFloat()
                 val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
                 val currentDate = LocalDateTime.now().format(formatter)
                 if (alturaFinal != null) {
-                    db.addImc(IMC(imc = ((peso.toFloat())/alturaFinal), datet = currentDate, peso = peso.toFloat()))
-                }
-                /*
-                activity?.startActivity(
-                    Intent(activity, IMCFinal::class.java).setFlags(
-                        FLAG_ACTIVITY_SINGLE_TOP
+
+                    db.addImc(
+                        IMC(
+                            imc = (peso.toFloat() / alturaFinal),
+                            datet = currentDate,
+                            peso = peso.toFloat(),
+                            fotoname = fotoNome // Agora o nome correto é passado
+                        )
                     )
-                )
-                 */
+                }
+
                 val intent = Intent(activity, IMCFinal::class.java).apply {
                     putExtra("peso", peso)
                 }
