@@ -19,7 +19,7 @@ fun MainNavHost(navController: NavHostController,viewModel: MainViewModel) {
         )  }
 
         composable<Route.Graficos> { GrafPage(
-            viewModel = viewModel
+
         )  }
         composable<Route.Fotos>  { FotosPage(
             viewModel = viewModel

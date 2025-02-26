@@ -1,6 +1,7 @@
 package com.example.medidordeimc
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NO_HISTORY
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -62,40 +63,33 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //enableEdgeToEdge()
-        val modifier = Modifier
 
-
+        // Tenta login automático se o usuário marcou "Lembrar-me"
+        tentarLoginAutomatico()
 
         setContent {
             MedidorDeIMCTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-
-                        TopAppBar(
-                            modifier = modifier.shadow(
-                                elevation = 5.dp,
-                                clip = false,
-                                ambientColor = GrayD,
-                                spotColor = GrayD
-                            ),
-                            colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = White,
-                                titleContentColor = White,
-                            ),
-                            title = {
-
-
-                                Image(
-                                    painter = painterResource(id = R.drawable.logotipologin_pressed),
-                                    contentDescription = "Imagem",
-                                    modifier = Modifier.size(165.dp).offset(105.dp,0.dp)
-                                )
-
-                            })
+                    TopAppBar(
+                        modifier = Modifier.shadow(
+                            elevation = 5.dp,
+                            clip = false,
+                            ambientColor = GrayD,
+                            spotColor = GrayD
+                        ),
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = White,
+                            titleContentColor = White,
+                        ),
+                        title = {
+                            Image(
+                                painter = painterResource(id = R.drawable.logotipologin_pressed),
+                                contentDescription = "Imagem",
+                                modifier = Modifier.size(165.dp).offset(105.dp, 0.dp)
+                            )
+                        })
 
                     LoginPage(
-
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -103,28 +97,46 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Tenta login automático se "Lembrar-me" estiver ativado
+    private fun tentarLoginAutomatico() {
+        val sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE)
+        val lembrar = sharedPreferences.getBoolean("lembrar", false)
 
+        if (lembrar) {
+            val email = sharedPreferences.getString("email", "")
+            val senha = sharedPreferences.getString("senha", "")
+
+            if (!email.isNullOrEmpty() && !senha.isNullOrEmpty()) {
+                Firebase.auth.signInWithEmailAndPassword(email, senha)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(this, "Login automático bem-sucedido!", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this, MainMenu::class.java))
+                            finish()
+                        }
+                    }
+            }
+        }
+    }
 }
 
-@Preview(showBackground = true)
 @Composable
 fun LoginPage(modifier: Modifier = Modifier) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var isChecked by rememberSaveable { mutableStateOf(false) }
-    val activity = LocalContext.current as? Activity
+    val context = LocalContext.current
+    val activity = context as? Activity
+
     Column(
-        //modifier = modifier.padding(19.dp,145.dp).fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = CenterHorizontally,
-
-        modifier = modifier.padding(16.dp,185.dp).fillMaxSize().shadow(
-            elevation = 5.dp,
-            shape = RoundedCornerShape(25.dp),
-            clip = false,
-            ambientColor = GrayD,
-            spotColor = GrayD
-        ).border(2.dp, White, shape = RoundedCornerShape(25.dp)).background(White,shape = RoundedCornerShape(25.dp)),
+        modifier = modifier
+            .padding(16.dp, 185.dp)
+            .fillMaxSize()
+            .shadow(5.dp, RoundedCornerShape(25.dp))
+            .border(2.dp, White, RoundedCornerShape(25.dp))
+            .background(White, RoundedCornerShape(25.dp))
     ) {
         Text(
             text = "BEM-VINDO(A)",
@@ -132,34 +144,25 @@ fun LoginPage(modifier: Modifier = Modifier) {
             color = GrayD,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
-            modifier = modifier.offset(0.dp, (-35).dp)
-            )
+            modifier = Modifier.offset(0.dp, (-35).dp)
+        )
 
         OutlinedTextField(
             value = email,
-
-            modifier = modifier.width(315.dp).height(50.dp).offset(0.dp, (-8).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
             onValueChange = { email = it },
+            modifier = Modifier.width(315.dp).height(50.dp).offset(0.dp, (-8).dp),
             shape = RoundedCornerShape(25.dp),
-            placeholder = { Text(text = "E-MAIL",
-                            fontStyle = FontStyle.Italic,
-                            color = GrayL,
-                            fontSize = 12.sp,
-                )}
+            placeholder = { Text("E-MAIL", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) }
         )
 
-            OutlinedTextField(
-                value = password,
-                placeholder = { Text(text = "SENHA",
-                          fontStyle = FontStyle.Italic,
-                          color = GrayL,
-                          fontSize = 12.sp
-                          ) },
-                modifier = modifier.width(315.dp).height(50.dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
-                onValueChange = { password = it },
-                visualTransformation = PasswordVisualTransformation(),
-                shape = RoundedCornerShape(25.dp)
-            )
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.width(315.dp).height(50.dp),
+            shape = RoundedCornerShape(25.dp),
+            placeholder = { Text("SENHA", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) }
+        )
 
         Row(modifier = Modifier){
             Checkbox(
@@ -193,7 +196,7 @@ fun LoginPage(modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Normal,
                 fontStyle = FontStyle.Italic,
                 modifier = modifier.offset((-26).dp,26.dp)
-                )
+            )
             Button(
                 modifier = modifier.background(Color.Transparent,shape = RoundedCornerShape(25.dp)).offset(25.dp,14.dp),
                 onClick = {
@@ -208,80 +211,92 @@ fun LoginPage(modifier: Modifier = Modifier) {
                     }
                 } ,
                 colors= ButtonColors(
-                        containerColor = Color.Transparent,
-                contentColor = GrayD,
-                disabledContainerColor = GrayL,
-                disabledContentColor = GrayD,
-            )
+                    containerColor = Color.Transparent,
+                    contentColor = GrayD,
+                    disabledContainerColor = GrayL,
+                    disabledContentColor = GrayD,
+                )
             ){ Text(text = "Deseja alterar senha?",
                 fontSize = 12.sp,
 
                 fontWeight = FontWeight.Normal,
                 fontStyle = FontStyle.Italic,
-                ) }
+            ) }
         }
 
+        Button(
+            enabled = email.isNotEmpty() && password.isNotEmpty(),
+            modifier = Modifier.width(315.dp).offset(0.dp, 15.dp),
+            onClick = {
+                Firebase.auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(activity!!) { task ->
+                        if (task.isSuccessful) {
+                            if (isChecked) {
+                                salvarCredenciais(context, email, password)
+                            } else {
+                                apagarCredenciais(context)
+                            }
+                            activity.startActivity(
+                                Intent(activity, MainMenu::class.java).setFlags(FLAG_ACTIVITY_SINGLE_TOP)
+                            )
+                            Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(activity, "Login FALHOU!", Toast.LENGTH_LONG).show()
+                        }
+                    }
+            },
+            colors = ButtonColors(
+                containerColor = Aqua80,
+                contentColor = GrayD,
+                disabledContainerColor = GrayL,
+                disabledContentColor = GrayD,
+            )
+        ) {
+            Text("LOGIN", fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold)
+        }
 
         Button(
-
-                enabled = email.isNotEmpty() && password.isNotEmpty(),
-                modifier = modifier.width(315.dp).offset(0.dp,15.dp),
-                onClick = {
-
-                    Firebase.auth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(activity!!) { task ->
-                            if (task.isSuccessful) {
-                                activity.startActivity(
-                                    Intent(activity, MainMenu::class.java).setFlags(
-                                        FLAG_ACTIVITY_SINGLE_TOP
-                                    )
-                                )
-                                Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
-                            } else {
-                                Toast.makeText(activity, "Login FALHOU!", Toast.LENGTH_LONG).show()
-                            }
-                        }
-                },
-                colors= ButtonColors(
-                    containerColor = Aqua80,
-                    contentColor = GrayD,
-                    disabledContainerColor = GrayL,
-                    disabledContentColor = GrayD,
-                ),
-
-                ) {
-                Text("LOGIN",
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold)
-            }
-
-            Button(
-                onClick = {
-
-                    try {
-
-                        activity?.startActivity(
-                            Intent(activity, CadastroActivity::class.java).setFlags(
-                                FLAG_ACTIVITY_SINGLE_TOP or FLAG_ACTIVITY_NO_HISTORY
-                            )
+            onClick = {
+                try {
+                    activity?.startActivity(
+                        Intent(activity, CadastroActivity::class.java).setFlags(
+                            FLAG_ACTIVITY_SINGLE_TOP or FLAG_ACTIVITY_NO_HISTORY
                         )
-                    } catch (e: Exception) {
-                        e.printStackTrace() // Captura exceções para depuração
-                        Toast.makeText(activity, "Erro ao iniciar atividade", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                modifier = modifier.width(315.dp).offset(0.dp,15.dp),
-                colors= ButtonColors(
-                    containerColor = Aqua80,
-                    contentColor = GrayD,
-                    disabledContainerColor = Aqua80,
-                    disabledContentColor = GrayD,
-                ),
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(activity, "Erro ao iniciar atividade", Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier.width(315.dp).offset(0.dp, 15.dp),
+            colors = ButtonColors(
+                containerColor = Aqua80,
+                contentColor = GrayD,
+                disabledContainerColor = Aqua80,
+                disabledContentColor = GrayD,
+            )
+        ) {
+            Text("CADASTRAR", fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold)
+        }
+    }
+}
 
-            ) {
-                Text("CADASTRAR",
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold)
-            }
+// Função para salvar as credenciais
+private fun salvarCredenciais(context: Context, email: String, senha: String) {
+    val sharedPreferences = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
+    with(sharedPreferences.edit()) {
+        putString("email", email)
+        putString("senha", senha)
+        putBoolean("lembrar", true)
+        apply()
+    }
+}
+
+// Função para apagar as credenciais ao fazer logout
+private fun apagarCredenciais(context: Context) {
+    val sharedPreferences = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
+    with(sharedPreferences.edit()) {
+        clear()
+        apply()
     }
 }

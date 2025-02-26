@@ -8,6 +8,7 @@ plugins {
 
 }
 
+group= "com.github.philjay"
 android {
     packaging {
         resources {
@@ -70,7 +71,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
     // Google maps
+
+
     implementation("com.google.android.gms:play-services-maps:19.0.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
 // Google maps for compose

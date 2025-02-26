@@ -1,6 +1,10 @@
 package com.example.medidordeimc
 
 import android.app.Activity
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
+
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
 import android.util.Log
@@ -36,6 +40,7 @@ import com.google.firebase.auth.auth
 fun LogoutPage(modifier: Modifier = Modifier, viewModel: MainViewModel)  {
     Log.d("Navigation", "Navigated to LogoutPage")
     val activity = LocalContext.current as? Activity
+    val context = LocalContext.current // Obtém o contexto
     Column(
 
         verticalArrangement = Arrangement.Center,
@@ -65,6 +70,7 @@ fun LogoutPage(modifier: Modifier = Modifier, viewModel: MainViewModel)  {
             modifier = modifier.width(315.dp).offset(0.dp, 15.dp),
             onClick = {
                 Firebase.auth.signOut();
+                apagarCredenciais(context)
                activity?.startActivity(
                     Intent(activity, MainActivity::class.java).setFlags(
                         FLAG_ACTIVITY_SINGLE_TOP
@@ -92,4 +98,9 @@ fun LogoutPage(modifier: Modifier = Modifier, viewModel: MainViewModel)  {
 
     }
 }
-
+private fun apagarCredenciais(context: Context) {
+    val sharedPreferences = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.clear()
+    editor.apply()
+}

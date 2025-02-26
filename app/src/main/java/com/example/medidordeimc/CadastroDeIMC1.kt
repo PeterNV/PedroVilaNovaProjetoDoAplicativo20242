@@ -80,6 +80,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
+import java.util.Locale
 
 fun bitmapToBase64(bitmap: Bitmap): String {
     val byteArrayOutputStream = ByteArrayOutputStream()
@@ -180,7 +181,8 @@ class CadastroDeIMC1 : ComponentActivity() {
                 imageBitmap?.let { bitmap ->
                     val encodedImage = bitmapToBase64(bitmap)
                     val email = FirebaseAuth.getInstance().currentUser?.email ?: "unknown"
-                    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-hh-mm-ss")
+                    val  brazilLocale = Locale.Builder().setLanguage("pt").setRegion("BR").build()
+                    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss",brazilLocale)
 
                     fotoNome = if (email != "unknown") {
                         LocalDateTime.now().format(formatter) + email
