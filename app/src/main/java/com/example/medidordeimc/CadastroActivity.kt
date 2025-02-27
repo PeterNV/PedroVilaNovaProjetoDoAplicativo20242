@@ -120,7 +120,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
         horizontalAlignment = CenterHorizontally,
 
         modifier = modifier
-            .padding(19.dp, 135.dp)
+            .padding(19.dp, 115.dp)
             .fillMaxSize()
             .shadow(
                 elevation = 5.dp,
@@ -278,6 +278,12 @@ fun RegisterPage(modifier: Modifier = Modifier) {
             visualTransformation = PasswordVisualTransformation(),
             shape = RoundedCornerShape(25.dp),
         )
+        Text("A SENHA DEVE CONTER NO MÍNIMO 8 CARACTERES,\nINCLUINDO LETRAS MAIÚSCULAS E MINÚSCULAS, E \nNÚMEROS.",
+            fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            color = GrayD,
+            modifier = modifier.offset((0).dp,8.dp))
 
 
         Button(
@@ -286,7 +292,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                     && cpassword == password) && (isSelectedF || isSelectedM) && password.contains(regexPassword) && (date.length == 9 || date.length == 10) && date.contains(regexDate),
             modifier = modifier
                 .width(315.dp)
-                .offset(0.dp, 2.dp),
+                .offset(0.dp, 20.dp),
             onClick = {
 
                 Firebase.auth.createUserWithEmailAndPassword(email, password)
@@ -335,7 +341,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
                         FLAG_ACTIVITY_SINGLE_TOP
                     )
                 ) },
-            modifier = modifier.width(315.dp),
+            modifier = modifier.width(315.dp).offset(0.dp, 20.dp),
             colors= ButtonColors(
                 containerColor = Red,
                 contentColor = GrayD,
