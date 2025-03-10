@@ -50,18 +50,18 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
 
     Column(
 
-    verticalArrangement = Arrangement.Center,
-    horizontalAlignment = CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = CenterHorizontally,
 
-    modifier = modifier.padding(16.dp,155.dp).fillMaxSize().shadow(
-    elevation = 5.dp,
-    shape = RoundedCornerShape(25.dp),
-    clip = false,
-    ambientColor = GrayD,
-    spotColor = GrayD
-    ).border(2.dp, White, shape = RoundedCornerShape(25.dp)).background(White,shape = RoundedCornerShape(25.dp)),
+        modifier = modifier.padding(16.dp,155.dp).fillMaxSize().shadow(
+            elevation = 5.dp,
+            shape = RoundedCornerShape(25.dp),
+            clip = false,
+            ambientColor = GrayD,
+            spotColor = GrayD
+        ).border(2.dp, White, shape = RoundedCornerShape(25.dp)).background(White,shape = RoundedCornerShape(25.dp)),
 
-    ) {
+        ) {
         Text(
 
             text = "BEM-VINDO(A)",
@@ -115,8 +115,8 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
         RegistroStatus = "REGISTRAR IMC"
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val currentDate = LocalDateTime.now().format(formatter)
-        for(x in imcList.map { it.datet }){
-            if(x != currentDate || imcList.isEmpty()){
+        for(x in imcList.map { it.datet } ){
+            if(x != currentDate ){
                 permitirRegistro = true
                 RegistroStatus = "REGISTRAR IMC"
             }else{

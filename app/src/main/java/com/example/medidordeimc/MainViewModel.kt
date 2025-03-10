@@ -20,7 +20,7 @@ class MainViewModel (private val db: FBDatabase): ViewModel(), FBDatabase.Listen
     val imcv : IMC?
         get() = _imc.value
 
-    private val _imcs = mutableStateMapOf<Float, IMC>()
+    private val _imcs = mutableStateMapOf<String, IMC>()
     val imcs : List<IMC>
         get() = _imcs.values.toList()
     private val _dates = mutableStateMapOf<String, IMC>()
@@ -36,8 +36,9 @@ class MainViewModel (private val db: FBDatabase): ViewModel(), FBDatabase.Listen
     override fun onImcAdded(imc: IMC) {
         _imc.value = imc
     }
+
     override fun onImcsAdded(imc: IMC) {
-        _imcs[imc.imc] = imc
+        _imcs[imc.datet] = imc
     }
     override fun onDatesAdded(date: IMC) {
         _dates[date.datet] = date

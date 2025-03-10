@@ -78,5 +78,18 @@ class FBDatabase {
             .document(imc.imc.toString()).set(imc.toFBImc())
 
     }
-
+    fun update(imc: IMC) {
+        if (auth.currentUser == null) throw RuntimeException("Not logged in!")
+        val uid = auth.currentUser!!.uid
+        val fbImc = imc.toFBImc()
+        val changes = mapOf(
+            "imc" to fbImc.imc,
+            "datet" to fbImc.datet,
+            "peso" to fbImc.peso,
+            "fotoname" to fbImc.fotoname,
+            "monitored" to fbImc.monitored // Adiciona o estado de monitoramento
+        )
+        db.collection("users").document(uid)
+            .collection("usersimc").document(imc.datet).update(changes)
+    }
 }

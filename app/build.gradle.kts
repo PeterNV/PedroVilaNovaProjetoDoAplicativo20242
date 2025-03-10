@@ -25,7 +25,7 @@ android {
     defaultConfig {
         applicationId = "com.example.medidordeimc"
         minSdk = 34
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -55,7 +55,9 @@ android {
 
 dependencies {
     // Dependências essenciais para serialização
+    implementation("androidx.work:work-runtime-ktx:2.10.0")
     implementation("xml-apis:xml-apis:1.4.01")
+    implementation ("androidx.core:core-ktx:1.15.0")
     implementation("org.jetbrains.lets-plot:lets-plot-common:4.1.0")
     implementation("org.jetbrains.lets-plot:lets-plot-image-export:4.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0") // ou a versão mais recente

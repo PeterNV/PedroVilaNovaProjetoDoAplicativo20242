@@ -1,5 +1,6 @@
 package com.example.medidordeimc
-
+import androidx.work.Data
+import NotificationWorker
 import android.app.Activity
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -67,20 +68,36 @@ import com.example.medidordeimc.ui.theme.White
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Base64
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonColors
 import androidx.compose.ui.text.style.TextAlign
+//import androidx.core.content.ContextCompat.getSystemService
 
 import androidx.lifecycle.viewmodel.compose.viewModel
+//import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+//import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+//import com.example.medidordeimc.monitor.ForecastMonitor
+//import com.example.medidordeimc.monitor.ForecastWorker
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 import java.util.Locale
+import java.util.concurrent.TimeUnit
+
 
 fun bitmapToBase64(bitmap: Bitmap): String {
     val byteArrayOutputStream = ByteArrayOutputStream()
@@ -117,6 +134,7 @@ fun uploadBase64Image(base64String: String, fileName: String, onComplete: (Boole
 }
 private var fotoNome: String = ""
 private var fotoEnviadaComSuccesso =  false
+
 class CadastroDeIMC1 : ComponentActivity() {
 
     private var foto: String = ""
@@ -124,7 +142,16 @@ class CadastroDeIMC1 : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "imc_reminder_channel"
+            val channelName = "IMC Reminder"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(channelId, channelName, importance)
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
         setContent {
+
             MedidorDeIMCTheme {
                 var fotoState by rememberSaveable { mutableStateOf("") }
 
@@ -228,7 +255,7 @@ fun CIMC1(modifier: Modifier = Modifier,verificarPermissaoECapturarFoto: () -> U
     var email by rememberSaveable { mutableStateOf("") }
     var peso by rememberSaveable { mutableStateOf("") }
     val activity = LocalContext.current as? Activity
-
+    //val monitor = remember { ForecastMonitor(context ) }
     Column(
         //modifier = modifier.padding(19.dp,145.dp).fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -309,9 +336,14 @@ fun CIMC1(modifier: Modifier = Modifier,verificarPermissaoECapturarFoto: () -> U
             modifier = modifier.offset(0.dp, 2.dp)
         )
 
+
         var isSelectedI1 by rememberSaveable { mutableStateOf(false) }
         var isSelectedI2 by rememberSaveable { mutableStateOf(false) }
         var isSelectedI3 by rememberSaveable { mutableStateOf(false) }
+        val name = viewModel.user?.name?:"[não logado]"
+
+
+
         Row(){
             RadioButton(
                 selected = isSelectedI1, // Estado inicial
@@ -386,21 +418,47 @@ fun CIMC1(modifier: Modifier = Modifier,verificarPermissaoECapturarFoto: () -> U
                 .width(315.dp)
                 .offset(0.dp, 2.dp),
             onClick = {
+
                 val alturaFinal = altura.toFloat()*altura.toFloat()
                 val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
                 val currentDate = LocalDateTime.now().format(formatter)
-                if (alturaFinal != null) {
 
-                    db.addImc(
-                        IMC(
-                            imc = (peso.toFloat() / alturaFinal),
-                            datet = currentDate,
-                            peso = peso.toFloat(),
-                            fotoname = fotoNome // Agora o nome correto é passado
-                        )
-                    )
+                val imc = IMC(
+                    imc = (peso.toFloat() / alturaFinal),
+                    datet = currentDate,
+                    peso = peso.toFloat(),
+                    fotoname = fotoNome,
+                    isMonitored = isSelectedI1 || isSelectedI2 || isSelectedI3 // Define o estado de monitoramento
+                )
+
+                db.addImc(imc)
+                val interval = when {
+                    isSelectedI1 -> 14L
+                    isSelectedI2 -> 28L
+                    isSelectedI3 -> 42L
+                    else -> 0L
                 }
 
+                if (interval > 0) {
+                    val inputData = Data.Builder()
+                        .putString("city", "IMC Reminder") // Você pode passar dados adicionais aqui
+                        .build()
+
+                    val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
+                        repeatInterval = interval,
+                        repeatIntervalTimeUnit = TimeUnit.DAYS
+                    ).setInitialDelay(
+                        duration = interval, // Atraso inicial de 10 segundos (para teste)
+                        timeUnit = TimeUnit.DAYS
+                    ).setInputData(inputData)
+                        .build()
+
+                    WorkManager.getInstance(activity!!).enqueueUniquePeriodicWork(
+                        "IMC_Reminder",
+                        ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                        workRequest
+                    )
+                }
                 val intent = Intent(activity, IMCFinal::class.java).apply {
                     putExtra("peso", peso)
                 }
