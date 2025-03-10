@@ -75,7 +75,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonColors
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
@@ -116,6 +116,7 @@ fun uploadBase64Image(base64String: String, fileName: String, onComplete: (Boole
     }
 }
 private var fotoNome: String = ""
+private var fotoEnviadaComSuccesso =  false
 class CadastroDeIMC1 : ComponentActivity() {
 
     private var foto: String = ""
@@ -193,8 +194,10 @@ class CadastroDeIMC1 : ComponentActivity() {
                     uploadBase64Image(encodedImage, "$fotoNome.jpg") { success, url ->
                         if (success) {
                             foto = url ?: ""
+                            fotoEnviadaComSuccesso =  true
                             Toast.makeText(this, "Imagem enviada com sucesso!", Toast.LENGTH_SHORT).show()
                         } else {
+                            fotoEnviadaComSuccesso =  false
                             Toast.makeText(this, "Falha no upload da imagem", Toast.LENGTH_SHORT).show()
                         }
                     }

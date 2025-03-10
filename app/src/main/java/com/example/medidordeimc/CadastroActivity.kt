@@ -120,7 +120,7 @@ fun RegisterPage(modifier: Modifier = Modifier) {
         horizontalAlignment = CenterHorizontally,
 
         modifier = modifier
-            .padding(19.dp, 115.dp)
+            .padding(19.dp, 85.dp)
             .fillMaxSize()
             .shadow(
                 elevation = 5.dp,

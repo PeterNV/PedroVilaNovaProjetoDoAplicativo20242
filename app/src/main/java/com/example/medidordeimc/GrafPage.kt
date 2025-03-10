@@ -1,39 +1,42 @@
 package com.example.medidordeimc
 
 
+import android.R.attr.startX
+import android.R.attr.startY
+import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.medidordeimc.db.fb.FBDatabase
-import com.example.medidordeimc.ui.theme.GrayD
-import com.example.medidordeimc.ui.theme.Aqua80
-import com.example.medidordeimc.ui.theme.White
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.medidordeimc.model.IMC
-import org.jetbrains.letsPlot.core.plot.builder.assemble.geom.GeomProvider.Companion.text
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medidordeimc.db.fb.FBDatabase
+import com.example.medidordeimc.ui.theme.Aqua80
+import com.example.medidordeimc.ui.theme.GrayD
+import com.example.medidordeimc.ui.theme.White
+
+private val paint = Paint()
 
 @Composable
 fun ScatterPlot(
@@ -52,24 +55,38 @@ fun ScatterPlot(
 
     Box(modifier.size(300.dp), contentAlignment = Alignment.Center) {
         val textPaint = Paint().apply {
-            textSize = 24f
+            textSize = 20f
             color = Color.Black.toArgb()
         }
 
         Canvas(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
+
         ) {
+
+
+
+            drawLine(
+                start = Offset(x = 12F, y = -50F),  // Ponto inicial (topo)
+                end = Offset(x = 12F, y = 850F),   // Ponto final (base)
+                color = Color.Black,
+                strokeWidth = 3F // Ajustei a espessura para um valor mais razoável
+            )
+            drawLine(
+                start = Offset(x = 12F, y = 850F),  // Ponto inicial (topo)
+                end = Offset(x = 850F, y = 850F),   // Ponto final (base)
+                color = Color.Black,
+                strokeWidth = 3F // Ajustei a espessura para um valor mais razoável
+            )
             val maxY = yValues.maxOrNull() ?: 1
             val xSpacing = size.width / (xValues.size + 1)
-            val ySpacing = size.height / (maxY + 1)
+            val ySpacing = size.height / (maxY -4)
 
             xValues.forEachIndexed { index, label ->
                 drawContext.canvas.nativeCanvas.drawText(
                     label,
                     xSpacing * (index + 1),
-                    size.height - 10f,
+                    size.height,
                     textPaint
                 )
             }
@@ -77,7 +94,7 @@ fun ScatterPlot(
             for (index in 0..maxY step interval) {
                 drawContext.canvas.nativeCanvas.drawText(
                     index.toString(),
-                    10f,
+                    25f,
                     size.height - (ySpacing * index),
                     textPaint
                 )
@@ -104,36 +121,37 @@ fun GrafPage(modifier: Modifier = Modifier) {
     val imcList = viewModel.imcs
     var next by remember { mutableIntStateOf(0) }
 
-    val months = listOf("JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ")
-    val maxImc = imcList.maxOfOrNull { it.imc.toInt() } ?: 0
-
+    val months = listOf(" JAN ", " FEV ", " MAR ", " ABR ", " MAI ", " JUN ", " JUL ", " AGO ", " SET ", " OUT ", " NOV ", " DEZ ")
 
     var dist = 0
     var data = ""
-// Verifica se a lista contém elementos antes de acessar
-    if (imcList.isNotEmpty() && imcList[0].datet != null) {
-        val dataList = imcList[0].datet!!
+
+
+    if (imcList.isNotEmpty()) {
+        val dataList = imcList[0].datet
 
         if (dataList.length >= 5) {
-            val monthPart = dataList.substring(3, 5)
-            data = imcList[next].datet!!
+
+            data = imcList[next].datet
+            val monthPart =  data.substring(3, 5)
             dist = when (monthPart) {
-                "01" -> 30
-                "02" -> 60
-                "03" -> 90
-                "04" -> 120
-                "05" -> 150
-                "06" -> 180
-                "07" -> 210
-                "08" -> 240
-                "09" -> 270
-                "10" -> 300
-                "11" -> 330
-                "12" -> 360
+                "01" -> 40
+                "02" -> 80
+                "03" -> 120
+                "04" -> 160
+                "05" -> 200
+                "06" -> 240
+                "07" -> 280
+                "08" -> 320
+                "09" -> 360
+                "10" -> 400
+                "11" -> 440
+                "12" -> 480
                 else -> 0
             }
         }
     }
+
 
 // Exibe um indicador de carregamento caso a lista esteja vazia
     if (imcList.isEmpty()) {
@@ -151,11 +169,11 @@ fun GrafPage(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .padding(16.dp, 15.dp)
+            .padding(10.dp, 10.dp)
             .fillMaxSize()
             .shadow(
                 elevation = 5.dp,
-                shape = RoundedCornerShape(25.dp),
+                shape = RoundedCornerShape(20.dp),
                 clip = false,
                 ambientColor = GrayD,
                 spotColor = GrayD
@@ -165,22 +183,29 @@ fun GrafPage(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = data,
-            fontSize = 30.sp,
+            fontSize = 20.sp,
             color = GrayD,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
-            modifier = modifier.offset(0.dp, (25).dp)
+            modifier = modifier.offset(0.dp, (-10).dp)
         )
-        ScatterPlot(
-            xValues = months,
-            yValues = listOf(0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15).map { it * 12 },
-            interval = 10,
-            modifier = Modifier.size(475.dp),
-            points = listOf(imcList[next].imc),
-            dist = dist
-        )
+
+            ScatterPlot(
+                xValues = months,
+                yValues = listOf(0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15).map { it * 12 },
+                interval = 10,
+                modifier = Modifier
+                    .size(475.dp)
+                    .width(525.dp),
+                points = listOf(imcList[next].imc),
+                dist = dist
+            )
+
+
         Button(
-            modifier = modifier.width(315.dp).offset(0.dp, 15.dp),
+            modifier = modifier
+                .width(315.dp)
+                .offset(0.dp, 15.dp),
             onClick = {
                 if (next < imcList.lastIndex) {
                     next++  // Vai para a próxima imagem
@@ -206,7 +231,9 @@ fun GrafPage(modifier: Modifier = Modifier) {
                     next--  // Volta para a imagem anterior
                 }
             },
-            modifier = modifier.width(315.dp).offset(0.dp, 15.dp),
+            modifier = modifier
+                .width(315.dp)
+                .offset(0.dp, 15.dp),
             colors = ButtonColors(
                 containerColor = Aqua80,
                 contentColor = GrayD,
