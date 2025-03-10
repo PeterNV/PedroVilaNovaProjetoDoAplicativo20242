@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -32,22 +33,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.GrayD
-import com.example.medidordeimc.ui.theme.GrayL
 import com.example.medidordeimc.ui.theme.White
 import kotlinx.coroutines.delay
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     val name = viewModel.user?.name?:"[não logado]"
     val imcList = viewModel.imcs
     var i by rememberSaveable { mutableIntStateOf(0) }
+    var RegistroStatus by rememberSaveable { mutableStateOf("") }
+    var permitirRegistro by rememberSaveable { mutableStateOf(false) }
+    val verificarData by rememberSaveable { mutableStateOf("") }
     val activity = LocalContext.current as? Activity
+
     Column(
 
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = CenterHorizontally,
 
-    modifier = modifier.padding(16.dp,185.dp).fillMaxSize().shadow(
+    modifier = modifier.padding(16.dp,155.dp).fillMaxSize().shadow(
     elevation = 5.dp,
     shape = RoundedCornerShape(25.dp),
     clip = false,
@@ -67,7 +73,7 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
         )
         Text(
 
-            text = "($name)",
+            text = name,
             fontSize = 25.sp,
             color = GrayD,
             fontWeight = FontWeight.Bold,
@@ -106,9 +112,21 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
             fontStyle = FontStyle.Italic,
             modifier = modifier.offset(0.dp, 15.dp)
         )
+        RegistroStatus = "REGISTRAR IMC"
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        val currentDate = LocalDateTime.now().format(formatter)
+        for(x in imcList.map { it.datet }){
+            if(x != currentDate || imcList.isEmpty()){
+                permitirRegistro = true
+                RegistroStatus = "REGISTRAR IMC"
+            }else{
+                permitirRegistro = false
+                RegistroStatus = "REGISTRO DE HOJE JÁ FOI FEITO"
+            }
+        }
         Button(
 
-            
+            enabled = permitirRegistro == true || imcList.isEmpty(),
             modifier = modifier.width(315.dp).offset(0.dp, 45.dp),
             onClick = {
                 try {
@@ -131,8 +149,9 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
             ),
 
             ) {
+
             Text(
-                "REGISTRAR IMC",
+                RegistroStatus,
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold
             )
