@@ -150,7 +150,7 @@ fun LoginPage(modifier: Modifier = Modifier) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            modifier = Modifier.width(315.dp).height(50.dp).offset(0.dp, (-8).dp),
+            modifier = Modifier.width(315.dp).height(50.dp).offset(0.dp, (-8).dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
             shape = RoundedCornerShape(25.dp),
             placeholder = { Text("E-MAIL", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) }
         )
@@ -159,7 +159,7 @@ fun LoginPage(modifier: Modifier = Modifier) {
             value = password,
             onValueChange = { password = it },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.width(315.dp).height(50.dp),
+            modifier = Modifier.width(315.dp).height(50.dp).border(2.dp, GrayD, shape = RoundedCornerShape(25.dp)),
             shape = RoundedCornerShape(25.dp),
             placeholder = { Text("SENHA", fontStyle = FontStyle.Italic, color = GrayL, fontSize = 12.sp) }
         )
