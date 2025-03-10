@@ -115,8 +115,8 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
         RegistroStatus = "REGISTRAR IMC"
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val currentDate = LocalDateTime.now().format(formatter)
-        for(x in imcList.map { it.datet }){
-            if(x != currentDate || imcList.isEmpty()){
+        for(x in imcList.map { it.datet } ){
+            if(x != currentDate ){
                 permitirRegistro = true
                 RegistroStatus = "REGISTRAR IMC"
             }else{
