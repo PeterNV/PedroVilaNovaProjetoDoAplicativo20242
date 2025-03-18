@@ -35,6 +35,7 @@ import com.example.medidordeimc.ui.theme.Aqua80
 import com.example.medidordeimc.ui.theme.GrayD
 import com.example.medidordeimc.ui.theme.White
 import kotlinx.coroutines.delay
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -114,16 +115,21 @@ fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
         )
         RegistroStatus = "REGISTRAR IMC"
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        val currentDate = LocalDateTime.now().format(formatter)
-        for(x in imcList.map { it.datet } ){
-            if(x != currentDate ){
-                permitirRegistro = true
-                RegistroStatus = "REGISTRAR IMC"
-            }else{
-                permitirRegistro = false
-                RegistroStatus = "REGISTRO DE HOJE JÁ FOI FEITO"
-            }
+        val currentDate = LocalDate.now().format(formatter)
+
+// Obtém a última data registrada no banco de dados
+        val lastDate = imcList.map { it.datet }
+            .maxOrNull()  // Obtém a data mais recente
+
+// Verifica se a última data é diferente da data de hoje
+        if (imcList.isEmpty() || lastDate == null || lastDate != currentDate) {
+            permitirRegistro = true
+            RegistroStatus = "REGISTRAR IMC"
+        } else {
+            permitirRegistro = false
+            RegistroStatus = "REGISTRO DE HOJE JÁ FOI FEITO"
         }
+
         Button(
 
             enabled = permitirRegistro == true || imcList.isEmpty(),
